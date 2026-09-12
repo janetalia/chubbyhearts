@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { Bell, Calendar, Check, Mail, MapPin, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Bell, Calendar, Check, Mail, MapPin } from "lucide-react";
+import Image from "next/image";
 import FormField from "../components/form-field";
 import PageHeading from "../components/page-heading";
 
@@ -11,24 +11,23 @@ export default function AccountPage() {
   return (
     <div className="max-w-309.75">
       <PageHeading
-        title="Account"
-        action={
-          <Button className="h-13.25 rounded-[16px] bg-[#ee9266] px-8.5 text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358]">
-            Save Changes
-          </Button>
-        }
-      />
+  title="Account"
+  action={
+    <Button className="hidden h-13.25 rounded-[16px] bg-[#ee9266] px-8.5 text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358] md:block">
+      Save Changes
+    </Button>
+  }
+/>
 
-      <div className="mt-[29px] grid gap-6 lg:grid-cols-[395px_1fr]">
+      <div className="mt-5 md:mt-[29px] grid gap-6 lg:grid-cols-[395px_1fr]">
         <Card className="rounded-[16px] border-[#ede9e4] p-8 text-center shadow">
           <div className="mx-auto h-[156px] w-[156px] overflow-hidden rounded-full border border-[#ede9e4] bg-[#f9f5eb]">
             <Image src="/avatar/Image (Bella).svg" alt="JL Turner" width={156} height={156} className="h-full w-full object-cover" />
           </div>
           <h2 className="mt-4 text-[32px] font-semibold text-[#1a1a1a]">JL Turner</h2>
-          <p className="text-sm font-semibold text-[#e05a3a]">Foster caregiver</p>
+          {/* <p className="text-sm font-semibold text-[#e05a3a]">Foster caregiver</p> */}
           <div className="mt-4 space-y-3 text-left text-sm text-[#6f6b65]">
             <p className="flex items-center gap-3"><Mail className="h-4 w-4" /> jlturner@example.com</p>
-            <p className="flex items-center gap-3"><Shield className="h-4 w-4" /> Hope Paws Rescue</p>
             <p className="flex items-center gap-3"><Calendar className="h-4 w-4" /> Member since 2023</p>
           </div>
         </Card>
@@ -66,12 +65,20 @@ export default function AccountPage() {
             </div>
           </Card>
         </div>
+
+              <div className="flex justify-end md:hidden">
+  <Button className="h-13.25 w-full rounded-[16px] bg-[#ee9266] px-8.5 text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358]">
+    Save Changes
+  </Button>
+</div>
       </div>
 
       <div className="mt-8 flex items-center justify-center gap-2 text-xs leading-4 text-[#9a9a9a]">
         <MapPin className="h-4 w-4" />
         <span>Tap a card behind to bring it to front</span>
       </div>
+
+
     </div>
   );
 }

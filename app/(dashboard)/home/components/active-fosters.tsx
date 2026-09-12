@@ -9,7 +9,6 @@ export default function ActiveFosters({ fosters, onSelect }: { fosters: Foster[]
     <div className="flex h-7 items-center gap-2">
       <h2 className="text-sm font-semibold leading-5 text-[#3a3a3a]">Your active fosters</h2>
       <Heart className="size-4 fill-[#fb2c36] text-[#fb2c36]" />
-      <Link href="/my-foster-family" className="ml-auto rounded-full border border-[#d1d5db] px-3 py-1 text-xs text-[#364153] md:hidden">View all</Link>
     </div>
     <div className="mt-7 flex h-[124px] items-start gap-3 overflow-x-auto">
       {fosters.map(foster => <button key={foster.id} onClick={() => onSelect(foster.id)} aria-label={`View ${foster.name}`} className="flex w-[90px] shrink-0 flex-col items-center gap-1 rounded-2xl focus-visible:outline-2 focus-visible:outline-primary">
