@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Bell, Calendar, Check, Mail, MapPin } from "lucide-react";
+import { Calendar, KeyRound, Mail } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import FormField from "../components/form-field";
 import PageHeading from "../components/page-heading";
 
@@ -30,6 +31,13 @@ export default function AccountPage() {
             <p className="flex items-center gap-3"><Mail className="h-4 w-4" /> jlturner@example.com</p>
             <p className="flex items-center gap-3"><Calendar className="h-4 w-4" /> Member since 2023</p>
           </div>
+          <Link
+            href="/reset-password"
+            className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[12px] border border-[#e9e5de] text-sm font-semibold text-[#252525] hover:bg-[#f9f5eb]"
+          >
+            <KeyRound className="h-4 w-4 text-[#e05a3a]" />
+            Reset password
+          </Link>
         </Card>
 
         <div className="space-y-6">
@@ -43,27 +51,7 @@ export default function AccountPage() {
             </div>
           </Card>
 
-          <Card className="rounded-[16px] border-[#ede9e4] p-6 shadow">
-            <h2 className="flex items-center gap-2 text-base font-semibold text-[#252525]">
-              <Bell className="h-4 w-4" />
-              Notifications
-            </h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              {["New adoption interest", "Rescue updates", "Card scan activity", "Weekly summary"].map((item) => (
-                <label key={item} className="flex h-[51px] items-center justify-between rounded-[16px] border border-[#e9e5de] px-4 text-sm font-medium text-[#252525]">
-                  {item}
-<div className="relative h-4 w-4">
-  <input
-    type="checkbox"
-    defaultChecked
-    className="peer h-4 w-4 appearance-none rounded border border-gray-300 bg-white checked:border-[#ee9266] checked:bg-[#ee9266]"
-  />
-  <Check className="pointer-events-none absolute inset-0 h-4 w-4 text-white opacity-0 peer-checked:opacity-100" />
-</div>
-                </label>
-              ))}
-            </div>
-          </Card>
+         
         </div>
 
               <div className="flex justify-end md:hidden">
@@ -73,10 +61,7 @@ export default function AccountPage() {
 </div>
       </div>
 
-      <div className="mt-8 flex items-center justify-center gap-2 text-xs leading-4 text-[#9a9a9a]">
-        <MapPin className="h-4 w-4" />
-        <span>Tap a card behind to bring it to front</span>
-      </div>
+      
 
 
     </div>

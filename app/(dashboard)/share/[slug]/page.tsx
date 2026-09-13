@@ -80,7 +80,7 @@ function ShareView({ foster }: { foster: NonNullable<ReturnType<typeof useFoster
 
       <h2 className="mt-4 text-3xl font-bold text-[#1a1a1a]">{foster.name}</h2>
       <p className="mt-1 flex items-center gap-1.5 text-sm text-[#8a857e]">
-        <Shield className="size-3.5" />
+        {/* <Shield className="size-3.5" /> */}
         Rescue: {foster.rescue}
       </p>
 

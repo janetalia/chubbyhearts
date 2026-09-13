@@ -53,5 +53,6 @@ export function deleteFoster(id: string) { persist(snapshot().filter(item => ite
 export function shareUrl(foster: Foster) {
   // Uploaded photos remain on this device until an image-hosting backend is connected.
   const shareable = { ...foster, image: foster.image.startsWith("/avatar/") || foster.image.startsWith("/pets/") ? foster.image : "" };
-  return `${window.location.origin}/pet-card#${encodeURIComponent(JSON.stringify(shareable))}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/pet-card#${encodeURIComponent(JSON.stringify(shareable))}`;
 }

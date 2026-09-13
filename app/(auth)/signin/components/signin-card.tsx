@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -76,6 +77,11 @@ export default function SigninCard() {
             >
               Sign in with email
             </Button>
+            <div className="pt-4 text-center">
+              <Link href="/reset-password" className="text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline">
+                Forgot your password?
+              </Link>
+            </div>
           </div>
 
           <p className="pt-9 text-center text-xs leading-[19.5px] text-[#666]">
