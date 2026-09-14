@@ -2,13 +2,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useFosterFamilySearch } from "../components/foster-family-search-context";
 import { useFosters } from "@/lib/fosters";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "cn";
 
 export default function MyFosterFamilyPage() {
-  const { search } = useFosterFamilySearch();
+  const { search, setSearch } = useFosterFamilySearch();
   const pastFosters = useFosters().filter((item) => item.status === "past");
   const searchValue = search.trim().toLowerCase();
   const fosters = useMemo(() => {
@@ -30,17 +32,49 @@ export default function MyFosterFamilyPage() {
 
   return (
     <div className="max-w-[1239px]">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold leading-8">My Foster Family</h1>
-        <Link
-          href="/my-foster-family/add"
-          aria-label="Add a past foster"
-          title="Add a past foster"
-        >
-          <Button className="hidden h-12.25 rounded-[16px] bg-[#ee9266] px-8.5 text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358] md:block">
-            New foster
-          </Button>
-        </Link>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-xl font-semibold leading-8">My Foster Family</h1>
+
+          <Link
+            href="/my-foster-family/add"
+            aria-label="Add a past foster"
+            title="Add a past foster"
+          >
+            {/* Mobile */}
+            <Button className="inline-flex h-6 shrink-0 items-center justify-center rounded-full bg-[#ee9266] px-2.5 text-sm font-semibold leading-none text-white shadow-[0_2px_4px_rgba(217,111,97,0.3)] hover:bg-[#df8358] md:hidden">
+              + Add
+            </Button>
+          </Link>
+        </div>
+
+        {/* Search */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/my-foster-family/add"
+            aria-label="Add a past foster"
+            title="Add a past foster"
+            className="hidden md:inline-block"
+          >
+            <Button className="hidden h-10 items-center gap-2 rounded-[16px] bg-[#ee9266] px-4.5 text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358] md:flex">
+              <span>+</span>
+              <span>Add</span>
+            </Button>
+          </Link>
+
+          <div className="relative w-full md:mt-0 md:w-[352px]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#8a8a8a]" />
+
+            <Input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search"
+              aria-label="Search foster family"
+              className="h-10 rounded-[12px] bg-white pl-9 pr-3 text-sm"
+            />
+          </div>
+        </div>
       </div>
       <div className="mt-7 grid grid-cols-3 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {fosters.map((foster) => (
@@ -90,9 +124,8 @@ export default function MyFosterFamilyPage() {
             Your foster journey lives here.
           </h2>
           <p className="mt-1 text-sm leading-6 text-[#6b6b6b]">
-            Archive current foster cards or add past fosters
-            <br className="hidden md:block" /> to remember them all in one
-            place.
+            Every pet you've fostered,
+            <br className="hidden md:block" /> celebrated in one place.
           </p>
         </div>
         <Link

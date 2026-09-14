@@ -68,30 +68,30 @@ export default function FeaturedPetCard({ foster }: { foster: Foster }) {
 
         <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] [backface-visibility:hidden] [transform:rotateY(180deg)] md:min-h-[405px] md:p-[34px]">
           <div>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold leading-5 text-[#e05a3a]">Foster details</p>
-                <h2 className="mt-1 font-heading text-[32px] font-bold leading-[42px] text-[#1a1a1a] md:text-[44px] md:leading-[52px]">{foster.name}</h2>
-              </div>
+            {/* <div className="flex justify-end">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-[#e05a3a]">
                 <RotateCcw className="size-5" />
               </div>
-            </div>
+            </div> */}
 
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
               {detailItems.map(item => (
-                <div key={item.label} className="rounded-[16px] border border-[#ede9e4] bg-[#f9f5eb] p-4">
-                  <p className="text-xs font-semibold uppercase text-[#8a8a8a]">{item.label}</p>
-                  <p className="mt-1 text-base font-semibold text-[#252525]">{item.value || "Not added yet"}</p>
+                <div key={item.label}>
+                  <p className="text-[13px] font-semibold leading-5">{item.label}</p>
+                  <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
+                    <p className="text-sm leading-6 text-[#6b6b6b]">{item.value || "Not added yet"}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-5 rounded-[16px] border border-[#ede9e4] p-4">
-              <p className="text-xs font-semibold uppercase text-[#8a8a8a]">About</p>
-              <p className="mt-2 max-h-[180px] overflow-y-auto text-sm leading-6 text-[#4a4a4a] md:max-h-[130px]">
-                {foster.about || "No about details have been added yet."}
-              </p>
+            <div className="mt-5">
+              <p className="text-[13px] font-semibold leading-5">About them</p>
+              <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
+                <p className="max-h-[180px] overflow-y-auto text-sm leading-6 text-[#4a4a4a] md:max-h-[130px]">
+                  {foster.about || "No about details have been added yet."}
+                </p>
+              </div>
             </div>
           </div>
 
