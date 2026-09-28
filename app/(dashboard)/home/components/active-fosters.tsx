@@ -2,9 +2,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, Plus } from "lucide-react";
-import type { Foster } from "@/lib/fosters";
+import type { HomePet } from "../home-client";
 
-export default function ActiveFosters({ fosters, onSelect }: { fosters: Foster[]; onSelect: (id: string) => void }) {
+export default function ActiveFosters({ fosters, onSelect }: { fosters: HomePet[]; onSelect: (id: string) => void }) {
   return <section>
     <div className="flex h-7 items-center gap-2">
       <h2 className="text-sm font-semibold leading-5 text-[#3a3a3a]">Your active fosters</h2>

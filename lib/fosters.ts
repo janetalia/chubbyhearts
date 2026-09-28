@@ -1,15 +1,8 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import { z } from "zod";
-
-export const fosterSchema = z.object({
-  id: z.string(), name: z.string(), rescue: z.string(), image: z.string(),
-  age: z.string().default(""), weight: z.string().default(""), breed: z.string().default(""),
-  about: z.string().default(""), adoptionLink: z.string().default(""),
-  status: z.enum(["active", "past"]), startDate: z.string().default(""), endDate: z.string().default(""),
-});
-export type Foster = z.infer<typeof fosterSchema>;
-export const emptyFoster: Foster = { id: "", name: "", rescue: "", image: "", age: "", weight: "", breed: "", about: "", adoptionLink: "", status: "active", startDate: "", endDate: "" };
+export { emptyFoster, fosterSchema, type Foster } from "./foster-schema";
+import { emptyFoster, fosterSchema, type Foster } from "./foster-schema";
 const galleryImages = ["Image (Buddy).svg", "Container.svg", "Container (1).svg", "Image (Buddy) (1).svg", "Image (Buddy) (2).svg", "Image (Buddy) (3).svg", "Image (Buddy) (4).svg", "Image (Buddy) (5).svg", "Image (Buddy) (6).svg", "Image (Buddy) (8).svg"];
 export const initialFosters: Foster[] = [
   { ...emptyFoster, id: "max", name: "Max", rescue: "Happy Paws Rescue", image: "/avatar/Image (Lana).svg" },

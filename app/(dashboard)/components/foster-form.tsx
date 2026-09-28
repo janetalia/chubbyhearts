@@ -1,31 +1,43 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { emptyFoster, saveFoster, type Foster } from "@/lib/fosters";
+import { emptyFoster, type Foster } from "@/lib/fosters";
 import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { createFoster } from "./foster-actions";
 import FormField from "./form-field";
 import PhotoUpload from "./photo-upload";
 
 export default function FosterForm({ foster }: { foster?: Foster }) {
   const [draft, setDraft] = useState<Foster>(foster ?? emptyFoster);
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
   const router = useRouter();
   function update(field: keyof Foster, value: string) { setDraft(current => ({ ...current, [field]: value })); }
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft.name.trim()) { setError("Please enter your pet's name."); return; }
     if (draft.adoptionLink && !/^https?:\/\//i.test(draft.adoptionLink)) { setError("Use an adoption link starting with https:// or http://."); return; }
-    try {
-      const saved = { ...draft, name: draft.name.trim(), id: foster?.id ?? crypto.randomUUID() };
-      saveFoster(saved);
-      router.push(saved.status === "past" ? "/my-foster-family" : "/home");
-    } catch { setError("Your browser could not save this card. Try a smaller photo or free up browser storage."); }
+    setPending(true);
+    setError("");
+    const result = await createFoster({ ...draft, name: draft.name.trim() });
+    setPending(false);
+
+    if ("error" in result) {
+      setError(result.error);
+      toast.error("Card was not saved", { description: result.error });
+      return;
+    }
+
+    toast.success("Foster card saved");
+    router.push(result.redirectTo);
+    router.refresh();
   }
   return <form onSubmit={submit} className="max-w-[1239px]">
     <div className="flex min-h-[53px] items-center justify-between gap-3">
       <h1 className="text-xl font-semibold leading-8">{foster ? "Edit Card" : "Create a Card"}</h1>
-      <Button type="submit" className="hidden h-[53px] rounded-[16px] px-[34px] shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{foster ? "Save Changes" : "Save Card"}</Button>
+      <Button type="submit" disabled={pending} className="hidden h-[53px] rounded-[16px] px-[34px] shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
     {/* main form */}
     <div className={`mt-5 ${foster ? "grid gap-6 lg:grid-cols-2" : ""}`}>
@@ -44,7 +56,7 @@ export default function FosterForm({ foster }: { foster?: Foster }) {
     </div>
     {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
     <div className="mt-4 flex flex-col gap-3 md:flex-row">
-      <Button type="submit" className="h-[53px] rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{foster ? "Save Changes" : "Save Card"}</Button>
+      <Button type="submit" disabled={pending} className="h-[53px] rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
       <div className="py-3 text-center text-[12px] text-[#9A9A9A] hover:underline flex items-center gap-2 justify-center"> <MapPin className="size-4"/> <span>Tap a card behind to bring it to front</span></div>
   </form>;

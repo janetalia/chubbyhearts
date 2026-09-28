@@ -1,0 +1,93 @@
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ExternalLink, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { db } from "@/lib/prisma";
+import { petToFoster } from "@/lib/pet-mappers";
+
+export default async function PublicFosterPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const pet = await db.orm.public.Pet.where({ id }).first();
+
+  if (!pet) {
+    notFound();
+  }
+
+  const foster = petToFoster(pet);
+  const details = [
+    { label: "Age", value: foster.age },
+    { label: "Weight", value: foster.weight },
+    { label: "Breed", value: foster.breed },
+  ];
+
+  return (
+    <main className="min-h-screen bg-[#faf7ef] px-4 py-8 text-[#1a1a1a] md:px-8 md:py-12">
+      <div className="mx-auto max-w-5xl">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#e05a3a]">
+          <Heart className="size-4 fill-[#fb2c36] text-[#fb2c36]" />
+          Chubby Hearts
+        </Link>
+
+        <Card className="mt-6 overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-0 shadow-[0_12px_32px_rgba(0,0,0,0.08)] md:grid md:grid-cols-[0.9fr_1.1fr]">
+          <div className="relative min-h-[320px] bg-secondary md:min-h-[620px]">
+            {foster.image ? (
+              <Image
+                src={foster.image}
+                alt={foster.name}
+                fill
+                unoptimized
+                priority
+                sizes="(max-width: 767px) 100vw, 460px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full min-h-[320px] items-center justify-center px-8 text-center text-sm font-semibold text-[#8a8178]">
+                No photo added yet
+              </div>
+            )}
+            <div className="absolute left-4 top-4 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#e05a3a] shadow">
+              {foster.status === "active" ? "Active Foster" : "Foster Family"}
+            </div>
+          </div>
+
+          <section className="p-6 md:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[#e05a3a]">
+              {foster.rescue || "Foster profile"}
+            </p>
+            <h1 className="mt-3 font-heading text-[42px] font-bold leading-none md:text-[64px]">
+              {foster.name}
+            </h1>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {details.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-[#ede9e4] bg-[#fffaf2] p-4">
+                  <p className="text-xs font-semibold text-[#8a8178]">{item.label}</p>
+                  <p className="mt-2 text-sm font-semibold text-[#2d2925]">{item.value || "Not added"}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold">About {foster.name}</h2>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[#4a453f]">
+                {foster.about || "No story has been added yet."}
+              </p>
+            </div>
+
+            {foster.adoptionLink && (
+              <Button
+                render={<Link href={foster.adoptionLink} target="_blank" rel="noreferrer" />}
+                className="mt-8 h-12 rounded-[14px] px-6 text-base"
+              >
+                <ExternalLink className="size-4" />
+                Adoption Application
+              </Button>
+            )}
+          </section>
+        </Card>
+      </div>
+    </main>
+  );
+}

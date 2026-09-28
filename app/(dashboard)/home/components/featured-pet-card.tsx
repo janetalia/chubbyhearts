@@ -1,19 +1,22 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Archive, MoreHorizontal, Pencil, RotateCcw } from "lucide-react";
+import { Archive, Copy, MoreHorizontal, Pencil } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { saveFoster, type Foster } from "@/lib/fosters";
+import type { HomePet } from "../home-client";
+import { archivePet } from "../actions";
 
-export default function FeaturedPetCard({ foster }: { foster: Foster }) {
+export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
   const [flippedFosterId, setFlippedFosterId] = useState<string | null>(null);
   const flipped = flippedFosterId === foster.id;
+  const sharePath = `/foster/${foster.id}`;
 
   const detailItems = [
     { label: "Age", value: foster.age },
@@ -22,6 +25,32 @@ export default function FeaturedPetCard({ foster }: { foster: Foster }) {
   ];
 
   const toggleCard = () => setFlippedFosterId(current => current === foster.id ? null : foster.id);
+  async function handleArchive() {
+    setPending(true);
+    setError("");
+
+    const result = await archivePet(foster.id);
+
+    if (result?.error) {
+      setError(result.error);
+      toast.error("Archive failed", { description: result.error });
+    } else {
+      toast.success("Foster archived", {
+        description: `${foster.name} moved to your foster family.`,
+      });
+      router.refresh();
+    }
+
+    setPending(false);
+  }
+
+  async function handleCopyShare() {
+    const url = `${window.location.origin}${sharePath}`;
+    await navigator.clipboard.writeText(url);
+    toast.success("Share link copied", {
+      description: url,
+    });
+  }
 
   return <section className="mt-[14px] md:mt-[22px]">
     <div className="perspective-[1400px]">
@@ -54,7 +83,8 @@ export default function FeaturedPetCard({ foster }: { foster: Foster }) {
                 <DropdownMenuTrigger render={<Button size="icon" aria-label={`More options for ${foster.name}`} title="Card options" className="size-8 rounded-full bg-white text-[#6f6b65] md:bg-primary md:text-white" />}><MoreHorizontal className="size-5" /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 p-2">
                   <DropdownMenuItem onClick={() => router.push(`/edit-card/${foster.id}`)} className="gap-3 p-3"><Pencil />Edit Card</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { try { saveFoster({ ...foster, status: "past", endDate: new Date().toISOString().slice(0, 10) }); } catch { setError("Could not archive this card. Please try again."); } }} className="gap-3 p-3"><Archive />Archive Card</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyShare} className="gap-3 p-3"><Copy />Copy Share Link</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleArchive} disabled={pending} className="gap-3 p-3"><Archive />Archive Card</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -62,7 +92,11 @@ export default function FeaturedPetCard({ foster }: { foster: Foster }) {
               <h1 className="font-heading text-[32px] font-bold leading-[42px] text-[#1a1a1a] md:text-[51px] md:leading-[56px]">{foster.name}</h1>
               <p className="pt-2 text-base font-semibold leading-7 text-[#e05a3a] md:pt-1.5 md:text-[20px]">{foster.rescue}</p>
             </div>
-            <Link href={`/share/${foster.id}`} onClick={event => event.stopPropagation()} className="flex h-12 w-full items-center justify-center rounded-[16px] bg-primary text-base font-medium text-white hover:bg-primary/90 md:rounded-[12px]">Share</Link>
+            <div onClick={event => event.stopPropagation()}>
+              <Button type="button" onClick={handleCopyShare} className="flex h-12 w-full items-center justify-center rounded-[16px] bg-primary text-base font-medium text-white hover:bg-primary/90 md:rounded-[12px]">
+                Share
+              </Button>
+            </div>
           </div>
         </Card>
 
