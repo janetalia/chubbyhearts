@@ -2,7 +2,7 @@ This is the Jlturner Foster Family official github repository, provided By ELEVA
 
 ## Getting Started:
 
-First, run the development server:
+First, run the development server
 
 ```bash
 npm run dev
