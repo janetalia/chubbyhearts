@@ -1,12 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import QueryToast from "@/components/query-toast";
+import ResetPasswordForm from "./reset-password-form";
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage({
+  searchParams,
+}: PageProps<"/reset-password">) {
+  const params = await searchParams;
+  const invalidToken = params.error === "invalid_token";
+
   return (
     <div className="min-h-screen bg-[#f9f5eb] font-sans text-[#252525]">
+      {invalidToken && (
+        <QueryToast
+          id="invalid-reset-token"
+          title="Reset link invalid"
+          description="Your reset link is invalid or expired. Please request a new link."
+          type="error"
+        />
+      )}
       <header className="flex h-[81px] items-center justify-between border-b border-[#ede9e4] bg-white px-5 md:px-8">
         <Link href="/signin" className="relative h-[46px] w-[160px]" aria-label="Back to sign in">
           <Image
@@ -43,22 +56,7 @@ export default function ResetPasswordPage() {
             Enter your email and we will send password reset instructions.
           </p>
 
-          <form className="mt-8 space-y-4">
-            <label className="block">
-              <span className="text-[13px] font-semibold leading-5 text-[#252525]">Email</span>
-              <Input
-                type="email"
-                placeholder="jlturner@example.com"
-                className="mt-2 h-[51px] rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
-              />
-            </label>
-            <Button
-              type="submit"
-              className="h-[53px] w-full rounded-2xl bg-[#ee9266] text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358]"
-            >
-              Send reset link
-            </Button>
-          </form>
+          <ResetPasswordForm />
         </section>
       </main>
     </div>
