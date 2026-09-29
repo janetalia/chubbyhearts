@@ -18,7 +18,14 @@ const sessionCookieNames = [
 ];
 
 function hasSessionCookie(request: NextRequest) {
-  return sessionCookieNames.some((name) => request.cookies.has(name));
+  return request.cookies.getAll().some(({ name }) =>
+    sessionCookieNames.some((cookieName) => {
+      if (name === cookieName) return true;
+      if (!name.startsWith(`${cookieName}.`)) return false;
+
+      return /^\d+$/.test(name.slice(cookieName.length + 1));
+    }),
+  );
 }
 
 export function proxy(request: NextRequest) {

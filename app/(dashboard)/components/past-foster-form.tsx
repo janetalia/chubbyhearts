@@ -192,7 +192,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
         </div>
 
         {sortedPastFosters.length === 0 ? (
-          <p className="mt-4 text-sm text-[#9A9A9A]">No past fosters added yet.</p>
+          <p className="mt-4 text-sm text-[#9A9A9A] p-6 pt-0">No past fosters added yet.</p>
         ) : (
           <ul className="divide-y divide-input">
             {sortedPastFosters.map((entry) => (
