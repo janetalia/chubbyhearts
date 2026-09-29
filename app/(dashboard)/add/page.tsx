@@ -1,9 +1,9 @@
-import PastFosterForm from "../components/past-foster-form";
+import PastFosterFormPage from "../components/past-foster-form-page";
 
 export default function Page(){
     return(
         <>
-        <PastFosterForm/>
+        <PastFosterFormPage />
         </>
     )
 }

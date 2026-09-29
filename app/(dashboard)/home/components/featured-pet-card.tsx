@@ -52,7 +52,11 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
     });
   }
 
-  return <section className="mt-[14px] md:mt-[22px]">
+  function handleOpenShare() {
+    router.push(`/share/${foster.id}`);
+  }
+
+  return <section className="mt-3.5 md:mt-5.5">
     <div className="perspective-[1400px]">
       <div
         role="button"
@@ -66,19 +70,19 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             toggleCard();
           }
         }}
-        className={`relative min-h-[520px] cursor-pointer outline-none transition-transform duration-500 [transform-style:preserve-3d] focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-[405px] ${flipped ? "[transform:rotateY(180deg)]" : ""}`}
+        className={`relative min-h-130 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
       >
-        <Card className="absolute inset-0 flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] [backface-visibility:hidden] md:flex-row">
-          <div className="relative h-[257px] shrink-0 overflow-hidden bg-secondary md:h-[404px] md:w-[32%]">
+        <Card className="absolute inset-0 flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:flex-row">
+          <div className="relative h-64.25 shrink-0 overflow-hidden bg-secondary md:h-101 md:w-[32%]">
             {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-cover md:block" : "object-cover"} priority />}
             {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="100vw" className="object-cover md:hidden" priority />}
-            <div className="absolute left-[17px] top-4 flex items-center gap-1 rounded-full bg-white px-2 py-1 shadow md:gap-2 md:px-4 md:py-1.5">
-              <span className="size-3 rounded-full bg-[#4caf50]" /><span className="text-sm font-semibold leading-[22px] text-[#e05a3a] md:text-[17px]">Active</span>
+            <div className="absolute left-4.25 top-4 flex items-center gap-1 rounded-full bg-white px-2 py-1 shadow md:gap-2 md:px-4 md:py-1.5">
+              <span className="size-3 rounded-full bg-[#4caf50]" /><span className="text-sm font-semibold leading-5.5 text-[#e05a3a] md:text-[17px]">Active</span>
             </div>
-            <Image src="/Vector.svg" alt="" width={108} height={109} className="absolute -right-0 -top-10" />
+            <Image src="/Vector.svg" alt="" width={108} height={109} className="absolute right-0 -top-10" />
           </div>
-          <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 md:gap-[62px] md:p-[34px]">
-            <div className="absolute right-[18px] top-[18px] z-10 md:right-6 md:top-5" onClick={event => event.stopPropagation()}>
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 md:gap-15.5 md:p-8.5">
+            <div className="absolute right-4.5 top-4.5 z-10 md:right-6 md:top-5" onClick={event => event.stopPropagation()}>
               <DropdownMenu>
                 <DropdownMenuTrigger render={<Button size="icon" aria-label={`More options for ${foster.name}`} title="Card options" className="size-8 rounded-full bg-white text-[#6f6b65] md:bg-primary md:text-white" />}><MoreHorizontal className="size-5" /></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 p-2">
@@ -89,18 +93,18 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
               </DropdownMenu>
             </div>
             <div>
-              <h1 className="font-heading text-[32px] font-bold leading-[42px] text-[#1a1a1a] md:text-[51px] md:leading-[56px]">{foster.name}</h1>
+              <h1 className="font-heading text-[32px] font-bold leading-10.5 text-[#1a1a1a] md:text-[51px] md:leading-14">{foster.name}</h1>
               <p className="pt-2 text-base font-semibold leading-7 text-[#e05a3a] md:pt-1.5 md:text-[20px]">{foster.rescue}</p>
             </div>
             <div onClick={event => event.stopPropagation()}>
-              <Button type="button" onClick={handleCopyShare} className="flex h-12 w-full items-center justify-center rounded-[16px] bg-primary text-base font-medium text-white hover:bg-primary/90 md:rounded-[12px]">
+              <Button type="button" onClick={handleOpenShare} className="flex h-12 w-full items-center justify-center rounded-[16px] bg-primary text-base font-medium text-white hover:bg-primary/90 md:rounded-[12px]">
                 Share
               </Button>
             </div>
           </div>
         </Card>
 
-        <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] [backface-visibility:hidden] [transform:rotateY(180deg)] md:min-h-[405px] md:p-[34px]">
+        <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
           <div>
             {/* <div className="flex justify-end">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-[#e05a3a]">
@@ -122,7 +126,7 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             <div className="mt-5">
               <p className="text-[13px] font-semibold leading-5">About them</p>
               <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
-                <p className="max-h-[180px] overflow-y-auto text-sm leading-6 text-[#4a4a4a] md:max-h-[130px]">
+                <p className="max-h-45 overflow-y-auto text-sm leading-6 text-[#4a4a4a] md:max-h-32.5">
                   {foster.about || "No about details have been added yet."}
                 </p>
               </div>

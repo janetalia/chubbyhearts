@@ -95,6 +95,78 @@ export async function createFoster(input: Foster): Promise<SaveFosterResult> {
   };
 }
 
+export async function createPastFoster(input: Foster): Promise<SaveFosterResult> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: "You must be signed in to add a past foster." };
+  }
+
+  const cleaned = cleanFoster({ ...input, status: "past" });
+
+  if ("error" in cleaned) {
+    return { error: cleaned.error };
+  }
+
+  if (!input.rescue.trim()) {
+    return { error: "Please enter the rescue name." };
+  }
+
+  if (!input.startDate) {
+    return { error: "Please select a start date." };
+  }
+
+  if (!input.endDate) {
+    return { error: "Please select an end date." };
+  }
+
+  if (input.endDate < input.startDate) {
+    return { error: "End date can't be before the start date." };
+  }
+
+  const now = nowInstant();
+
+  await db.orm.public.Pet.create({
+    ...cleaned.foster,
+    userId: session.user.id,
+    startDate: instantFromDateInput(input.startDate),
+    endDate: instantFromDateInput(input.endDate),
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  revalidatePath("/my-foster-family");
+
+  return { success: true, redirectTo: "/my-foster-family" };
+}
+
+export async function deletePastFoster(id: string): Promise<{ success: true } | { error: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: "You must be signed in to remove a past foster." };
+  }
+
+  const foster = await db.orm.public.Pet
+    .where({ id, userId: session.user.id, status: "PAST" })
+    .first();
+
+  if (!foster) {
+    return { error: "Past foster not found." };
+  }
+
+  await db.orm.public.Pet
+    .where({ id, userId: session.user.id, status: "PAST" })
+    .delete();
+
+  revalidatePath("/my-foster-family");
+  revalidatePath("/my-foster-family/add");
+  revalidatePath("/my-foster-family/edit");
+  revalidatePath("/add");
+
+  return { success: true };
+}
+
 export async function updateFoster(id: string, input: Foster): Promise<SaveFosterResult> {
   const session = await auth();
 
@@ -132,4 +204,17 @@ export async function updateFoster(id: string, input: Foster): Promise<SaveFoste
     success: true,
     redirectTo: cleaned.foster.status === "PAST" ? "/my-foster-family" : "/home",
   };
+}
+
+function instantFromDateInput(value: string): ReturnType<typeof nowInstant> {
+  const timestamp = Date.parse(`${value}T00:00:00.000Z`);
+  const temporal = (globalThis as typeof globalThis & {
+    Temporal: {
+      Instant: {
+        fromEpochMilliseconds: (epochMilliseconds: number) => ReturnType<typeof nowInstant>;
+      };
+    };
+  }).Temporal;
+
+  return temporal.Instant.fromEpochMilliseconds(timestamp);
 }

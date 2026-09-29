@@ -1,13 +1,23 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { emptyFoster, saveFoster, type Foster } from "@/lib/fosters";
+import { emptyFoster, type Foster } from "@/lib/fosters";
 import { ArrowUpDown, Info, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { createPastFoster, deletePastFoster } from "./foster-actions";
 import FormField from "./form-field";
 import PastFosterPhotoUpload from "./past-foster-photo-upload";
 
 type PastFosterDraft = Foster & { startDate: string; endDate: string };
+
+export type RecentPastFoster = {
+  id: string;
+  name: string;
+  image: string;
+  startDate: string;
+  endDate: string;
+};
 
 const emptyPastFoster: PastFosterDraft = {
   ...emptyFoster,
@@ -16,36 +26,17 @@ const emptyPastFoster: PastFosterDraft = {
   endDate: "",
 };
 
-const saveData = [
-  {
-    id: "1",
-    image: "/pets/image (Buddy) (7).svg",
-    name: "Buddy",
-    startDate: "Jan 10, 2023",
-    endDate: "Apr 15, 2023",
-  },
-  {
-    id: "2",
-    image: "/pets/image (Charlie).svg",
-    name: "Luna",
-    startDate: "May 20, 2023",
-    endDate: "Aug 5, 2023",
-  },
-  {
-    id: "3",
-    image: "/pets/image (Luna).svg",
-    name: "Charlie",
-    startDate: "Sep 12, 2023",
-    endDate: "Dec 2, 2023",
-  },
-];
-
-export default function PastFosterForm() {
+export default function PastFosterForm({ recentPastFosters = [] }: { recentPastFosters?: RecentPastFoster[] }) {
   const [draft, setDraft] = useState<PastFosterDraft>(emptyPastFoster);
-  const [saved, setSaved] = useState(saveData);
   const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
   const [oldestFirst, setOldestFirst] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
+  const sortedPastFosters = [...recentPastFosters].sort((first, second) => {
+    const dateDifference = Date.parse(first.startDate) - Date.parse(second.startDate);
+    return oldestFirst ? dateDifference : -dateDifference;
+  });
 
   function update(field: keyof PastFosterDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -61,32 +52,47 @@ export default function PastFosterForm() {
     return "";
   }
 
-  function addAnother() {
+  async function addPastFoster() {
     const message = validate();
     if (message) {
       setError(message);
       return;
     }
     setError("");
-    setSaved((current) => [
-      ...current,
-      {
-        ...draft,
-        name: draft.name.trim(),
-        rescue: draft.rescue.trim(),
-        id: crypto.randomUUID(),
-      },
-    ]);
+    setPending(true);
+    const result = await createPastFoster({
+      ...draft,
+      name: draft.name.trim(),
+      rescue: draft.rescue.trim(),
+      status: "past",
+    });
+    setPending(false);
+
+    if ("error" in result) {
+      setError(result.error);
+      toast.error("Past foster was not saved", { description: result.error });
+      return;
+    }
+
+    toast.success("Past foster added");
     setDraft(emptyPastFoster);
+    router.refresh();
   }
 
-  function removeEntry(id: string) {
-    setSaved((current) => current.filter((entry) => entry.id !== id));
-  }
+  async function removePastFoster(id: string, name: string) {
+    if (!window.confirm(`Remove ${name} from your past fosters?`)) return;
 
-  function toggleSort() {
-    setOldestFirst((current) => !current);
-    setSaved((current) => [...current].reverse());
+    setDeletingId(id);
+    const result = await deletePastFoster(id);
+    setDeletingId(null);
+
+    if ("error" in result) {
+      toast.error("Past foster was not removed", { description: result.error });
+      return;
+    }
+
+    toast.success("Past foster removed");
+    router.refresh();
   }
 
   return (
@@ -162,10 +168,11 @@ export default function PastFosterForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={addAnother}
+            onClick={addPastFoster}
+            disabled={pending}
             className="w-full sm:w-fit h-[44px] shrink-0 rounded-[12px] border-[#D96F61] px-5 text-[#D96F61] hover:bg-[#D96F61]/5 hover:text-[#D96F61]"
           >
-            <Plus className="size-4" /> Add another
+            <Plus className="size-4" /> {pending ? "Saving..." : "Add past foster"}
           </Button>
         </div>
       </div>
@@ -173,49 +180,41 @@ export default function PastFosterForm() {
       <div className="mt-6 rounded-[16px] border border-input bg-white pt-6 shadow">
         <div className="flex items-center justify-between border-b px-6 pb-6">
           <p className="text-base font-semibold">
-            Past fosters added ({saved.length})
+            Past fosters added ({recentPastFosters.length})
           </p>
           <button
             type="button"
-            onClick={toggleSort}
+            onClick={() => setOldestFirst((current) => !current)}
             className="flex items-center gap-1.5 text-[13px] text-[#9A9A9A] hover:underline"
           >
-            <ArrowUpDown className="size-3.5" />{" "}
-            {oldestFirst ? "Oldest first" : "Newest first"}
+            <ArrowUpDown className="size-3.5" /> {oldestFirst ? "Oldest first" : "Newest first"}
           </button>
         </div>
 
-        {saved.length === 0 ? (
-          <p className="mt-4 text-sm text-[#9A9A9A]">
-            No past fosters added yet.
-          </p>
+        {sortedPastFosters.length === 0 ? (
+          <p className="mt-4 text-sm text-[#9A9A9A]">No past fosters added yet.</p>
         ) : (
           <ul className="divide-y divide-input">
-            {saved.map((entry) => (
+            {sortedPastFosters.map((entry) => (
               <li key={entry.id} className="flex items-center gap-3 py-3 px-6">
                 {entry.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={entry.image}
-                    alt={entry.name}
-                    className="size-10 shrink-0 rounded-full object-cover"
-                  />
+                  <img src={entry.image} alt={entry.name} className="size-10 shrink-0 rounded-full object-cover" />
                 ) : (
                   <div className="size-10 shrink-0 rounded-full bg-[#f2f0ed]" />
                 )}
                 <div className="flex-1">
-                  <p className="text-sm font-semibold leading-5">
-                    {entry.name}
-                  </p>
+                  <p className="text-sm font-semibold leading-5">{entry.name}</p>
                   <p className="text-[13px] text-[#9A9A9A]">
-                    {entry.startDate} – {entry.endDate}
+                    {formatPastFosterDate(entry.startDate)} - {formatPastFosterDate(entry.endDate)}
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => removeEntry(entry.id)}
+                  onClick={() => removePastFoster(entry.id, entry.name)}
                   aria-label={`Remove ${entry.name}`}
-                  className="p-2 text-[#9A9A9A] hover:text-destructive"
+                  disabled={deletingId === entry.id}
+                  className="p-2 text-[#9A9A9A] hover:text-destructive disabled:opacity-50"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -226,4 +225,13 @@ export default function PastFosterForm() {
       </div>
     </div>
   );
+}
+
+function formatPastFosterDate(value: string) {
+  if (!value) return "";
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
