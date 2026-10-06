@@ -124,7 +124,7 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
         ))}
       </div>
 
-      <section className="mt-12 flex flex-col gap-6 rounded-[16px] border border-border px-5 py-6 md:flex-row md:items-center">
+      <section className="flex flex-col gap-6 rounded-[16px] border border-border px-5 py-6 md:flex-row md:items-center">
         <Image src="/avatar/DogIllustration.svg" alt="" width={80} height={80} className="size-20 shrink-0" />
         <div className="flex-1">
           <h2 className="text-base font-bold">Your foster journey lives here.</h2>
@@ -133,18 +133,18 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
             <br className="hidden md:block" /> celebrated in one place.
           </p>
         </div>
-        <Link href="/my-foster-family/add" className="inline-flex h-[42px] w-fit items-center justify-center gap-1.5 rounded-[12px] border border-primary px-4 text-sm text-[#e05a3a] hover:bg-secondary">
+        <Link href="/my-foster-family/add" className="inline-flex h-10.5 w-fit items-center justify-center gap-1.5 rounded-[12px] border border-primary px-4 text-sm text-[#e05a3a] hover:bg-secondary">
           <Plus className="size-4" />
           Add a past foster
         </Link>
       </section>
 
       <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="rounded-[22px] bg-white p-0 sm:max-w-[520px] overflow-hidden flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[22px] bg-white p-0 sm:max-w-130 overflow-hidden flex flex-col max-h-[90vh]">
           {selected && (
             <>
               <div className="overflow-y-auto flex-1">
-                <div className="relative h-[230px] shrink-0 overflow-hidden rounded-t-[22px] bg-secondary">
+                <div className="relative h-57.5 shrink-0 overflow-hidden rounded-t-[22px] bg-secondary">
                   {selected.image ? (
                     <Image src={selected.image} alt={selected.name} fill unoptimized sizes="520px" className="object-cover" />
                   ) : (
