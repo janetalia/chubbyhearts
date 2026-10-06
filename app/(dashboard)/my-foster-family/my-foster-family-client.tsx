@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CalendarDays, Eye, Plus, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useFosterFamilySearch } from "../components/foster-family-search-context";
+import { unarchiveFoster } from "../components/foster-actions";
 
 export type FosterFamilyPet = {
   id: string;
@@ -71,7 +73,7 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
             </Button>
           </Link>
 
-          <div className="relative w-full md:mt-0 md:w-[352px]">
+          { fosters.length !== 0 && (<div className="relative w-full md:mt-0 md:w-88">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#8a8a8a]" />
             <Input
               type="search"
@@ -81,7 +83,7 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
               aria-label="Search foster family"
               className="h-10 rounded-[12px] bg-white pl-9 pr-3 text-sm"
             />
-          </div>
+          </div>)}
         </div>
       </div>
 
@@ -113,27 +115,14 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
             <div className="min-h-11 px-2 py-3 text-sm font-medium md:px-3">
               <p className="truncate">{foster.name}</p>
               <p className="mt-0.5 hidden truncate text-xs text-[#8a8a8a] md:block">{foster.rescue || "Rescue not added"}</p>
+              <p className="mt-1 truncate text-[11px] text-[#a0a0a0] md:text-xs flex items-center gap-1">
+                <CalendarDays className="size-3" />
+                {formatRange(foster.startDate, foster.endDate) || "Dates not added"}
+              </p>
             </div>
           </button>
         ))}
       </div>
-
-      {fosters.length === 0 && (
-        <div className="mt-10 rounded-[16px] border border-dashed border-border bg-white px-4 py-10 text-center">
-          <p className="text-sm font-medium">
-            {pastFosters.length === 0 ? "No foster family records yet." : "No foster family matches your search."}
-          </p>
-          <p className="mt-1 text-sm text-[#6b6b6b]">
-            {pastFosters.length === 0 ? "Add a past foster to complete your gallery." : "Try a name, rescue, breed, or date."}
-          </p>
-          {pastFosters.length === 0 && (
-            <Link href="/my-foster-family/add" className="mt-5 inline-flex h-[42px] items-center justify-center gap-1.5 rounded-[12px] bg-primary px-4 text-sm text-white hover:bg-primary/90">
-              <Plus className="size-4" />
-              Add a past foster
-            </Link>
-          )}
-        </div>
-      )}
 
       <section className="mt-12 flex flex-col gap-6 rounded-[16px] border border-border px-5 py-6 md:flex-row md:items-center">
         <Image src="/avatar/DogIllustration.svg" alt="" width={80} height={80} className="size-20 shrink-0" />
@@ -151,35 +140,57 @@ export default function MyFosterFamilyClient({ pastFosters }: { pastFosters: Fos
       </section>
 
       <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="rounded-[22px] bg-white p-0 sm:max-w-[520px]">
+        <DialogContent className="rounded-[22px] bg-white p-0 sm:max-w-[520px] overflow-hidden flex flex-col max-h-[90vh]">
           {selected && (
             <>
-              <div className="relative h-[230px] overflow-hidden rounded-t-[22px] bg-secondary">
-                {selected.image ? (
-                  <Image src={selected.image} alt={selected.name} fill unoptimized sizes="520px" className="object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm font-semibold text-[#9A9A9A]">No photo added</div>
-                )}
+              <div className="overflow-y-auto flex-1">
+                <div className="relative h-[230px] shrink-0 overflow-hidden rounded-t-[22px] bg-secondary">
+                  {selected.image ? (
+                    <Image src={selected.image} alt={selected.name} fill unoptimized sizes="520px" className="object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm font-semibold text-[#9A9A9A]">No photo added</div>
+                  )}
+                </div>
+                <div className="p-5">
+                  <DialogHeader>
+                    <DialogTitle className="font-heading text-[32px] font-bold leading-9 text-[#1a1a1a]">{selected.name}</DialogTitle>
+                    <DialogDescription className="font-semibold text-[#e05a3a]">{selected.rescue || "Rescue not added"}</DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                    <Detail label="Breed" value={selected.breed} />
+                    <Detail label="Age" value={selected.age} />
+                    <Detail label="Weight" value={selected.weight} />
+                    <Detail label="Dates" value={formatRange(selected.startDate, selected.endDate)} icon={<CalendarDays className="size-4 text-[#e05a3a]" />} />
+                  </div>
+                  <div className="mt-5 rounded-[16px] border border-input bg-white px-4 py-3.5">
+                    <p className="text-[13px] font-semibold leading-5">About them</p>
+                    <p className="mt-2 text-sm leading-6 text-[#4a4a4a]">
+                      {selected.about || "No about details have been added yet."}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="p-5">
-                <DialogHeader>
-                  <DialogTitle className="font-heading text-[32px] font-bold leading-9 text-[#1a1a1a]">{selected.name}</DialogTitle>
-                  <DialogDescription className="font-semibold text-[#e05a3a]">{selected.rescue || "Rescue not added"}</DialogDescription>
-                </DialogHeader>
-                <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                  <Detail label="Breed" value={selected.breed} />
-                  <Detail label="Age" value={selected.age} />
-                  <Detail label="Weight" value={selected.weight} />
-                  <Detail label="Dates" value={formatRange(selected.startDate, selected.endDate)} icon={<CalendarDays className="size-4 text-[#e05a3a]" />} />
-                </div>
-                <div className="mt-5 rounded-[16px] border border-input bg-white px-4 py-3.5">
-                  <p className="text-[13px] font-semibold leading-5">About them</p>
-                  <p className="mt-2 max-h-[110px] overflow-y-auto text-sm leading-6 text-[#4a4a4a]">
-                    {selected.about || "No about details have been added yet."}
-                  </p>
-                </div>
-                <Button type="button" onClick={() => setSelected(null)} className="mt-5 h-11 w-full rounded-[14px]">
-                  <Eye className="size-4" />
+              <div className="shrink-0 border-t border-[#ede9e4] bg-white p-4 flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => {
+                    const res = await unarchiveFoster(selected.id);
+                    if ('error' in res) {
+                      toast.error("Failed to unarchive", { description: res.error });
+                    } else {
+                      toast.success("Foster unarchived");
+                      setSelected(null);
+                    }
+                  }}
+                  className="flex-1 h-11 rounded-[14px]"
+                >
+                  Unarchive
+                </Button>
+                <Button render={<Link href={`/edit-card/${selected.id}`} />} variant="outline" className="flex-1 h-11 rounded-[14px]">
+                  Edit
+                </Button>
+                <Button type="button" onClick={() => setSelected(null)} className="flex-1 h-11 rounded-[14px] bg-[#ee9266] hover:bg-[#df8358] text-white">
                   Done
                 </Button>
               </div>

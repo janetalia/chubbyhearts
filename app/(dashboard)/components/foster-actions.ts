@@ -19,6 +19,7 @@ type CleanFosterResult =
         age: string | null;
         weight: string | null;
         breed: string | null;
+        socialLink: string | null;
         about: string | null;
         adoptionLink: string | null;
         status: "ACTIVE" | "PAST";
@@ -55,6 +56,7 @@ function cleanFoster(input: Foster): CleanFosterResult {
       age: foster.age.trim() || null,
       weight: foster.weight.trim() || null,
       breed: foster.breed.trim() || null,
+      socialLink: foster.socialLink.trim() || null,
       about: foster.about.trim() || null,
       adoptionLink: foster.adoptionLink.trim() || null,
       status: foster.status === "past" ? "PAST" as const : "ACTIVE" as const,
@@ -189,10 +191,13 @@ export async function updateFoster(id: string, input: Foster): Promise<SaveFoste
   }
 
   const now = nowInstant();
+  const newEndDate = cleaned.foster.status === "ACTIVE" 
+    ? null 
+    : (existing.status === "ACTIVE" ? now : existing.endDate);
 
   await db.orm.public.Pet.where({ id }).update({
     ...cleaned.foster,
-    endDate: cleaned.foster.status === "PAST" ? now : null,
+    endDate: newEndDate,
     updatedAt: now,
   });
 
@@ -204,6 +209,36 @@ export async function updateFoster(id: string, input: Foster): Promise<SaveFoste
     success: true,
     redirectTo: cleaned.foster.status === "PAST" ? "/my-foster-family" : "/home",
   };
+}
+
+export async function unarchiveFoster(id: string): Promise<SaveFosterResult> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: "You must be signed in to unarchive." };
+  }
+
+  const existing = await db.orm.public.Pet
+    .where({ id, userId: session.user.id })
+    .first();
+
+  if (!existing) {
+    return { error: "Foster card not found." };
+  }
+
+  const now = nowInstant();
+
+  await db.orm.public.Pet.where({ id }).update({
+    status: "ACTIVE",
+    endDate: null,
+    updatedAt: now,
+  });
+
+  revalidatePath("/home");
+  revalidatePath("/my-foster-family");
+  revalidatePath(`/foster/${id}`);
+
+  return { success: true, redirectTo: "/home" };
 }
 
 function instantFromDateInput(value: string): ReturnType<typeof nowInstant> {

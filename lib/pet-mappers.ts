@@ -8,6 +8,7 @@ export type PetRecord = {
   age: string | null;
   weight: string | null;
   breed: string | null;
+  socialLink: string | null;
   about: string | null;
   adoptionLink: string | null;
   status: "ACTIVE" | "PAST";
@@ -22,6 +23,7 @@ export function petToFoster(pet: PetRecord): Foster {
     age: pet.age || "",
     weight: pet.weight || "",
     breed: pet.breed || "",
+    socialLink: pet.socialLink || "",
     about: pet.about || "",
     adoptionLink: pet.adoptionLink || "",
     status: pet.status === "ACTIVE" ? "active" : "past",

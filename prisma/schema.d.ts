@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'1be88a680d30a0e1a502e59bd0a62e934afe1fc6c8245881f99e0e81448b1653'>;
+  StorageHashBase<'26b5d49868e3915fa430b55e069909c0a087f15462926350fa76de450be5f382'>;
 export type ExecutionHash =
   ExecutionHashBase<'1a601b500281f583ea3639d91321af2285389447a700847aba4061d671d02d57'>;
 export type ProfileHash =
@@ -275,6 +275,7 @@ export type FieldOutputTypes = {
       readonly image: CodecTypes['pg/text@1']['output'] | null;
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly rescue: CodecTypes['pg/text@1']['output'] | null;
+      readonly socialLink: CodecTypes['pg/text@1']['output'] | null;
       readonly startDate: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly status: 'ACTIVE' | 'PAST';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -334,6 +335,7 @@ export type FieldInputTypes = {
       readonly image: CodecTypes['pg/text@1']['input'] | null;
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly rescue: CodecTypes['pg/text@1']['input'] | null;
+      readonly socialLink: CodecTypes['pg/text@1']['input'] | null;
       readonly startDate: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly status: 'ACTIVE' | 'PAST';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -393,6 +395,7 @@ export type StorageColumnTypes = {
       readonly image: CodecTypes['pg/text@1']['output'] | null;
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly rescue: CodecTypes['pg/text@1']['output'] | null;
+      readonly socialLink: CodecTypes['pg/text@1']['output'] | null;
       readonly startDate: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly status: 'ACTIVE' | 'PAST';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -452,6 +455,7 @@ export type StorageColumnInputTypes = {
       readonly image: CodecTypes['pg/text@1']['input'] | null;
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly rescue: CodecTypes['pg/text@1']['input'] | null;
+      readonly socialLink: CodecTypes['pg/text@1']['input'] | null;
       readonly startDate: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly status: 'ACTIVE' | 'PAST';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -513,6 +517,7 @@ export namespace Models {
     image: CodecTypes['pg/text@1']['output'] | null;
     name: CodecTypes['pg/text@1']['output'];
     rescue: CodecTypes['pg/text@1']['output'] | null;
+    socialLink: CodecTypes['pg/text@1']['output'] | null;
     startDate: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     status: 'ACTIVE' | 'PAST';
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -719,6 +724,11 @@ type ContractBase = Omit<
                   readonly nullable: false;
                 };
                 readonly rescue: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly socialLink: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
@@ -1074,6 +1084,10 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly socialLink: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly startDate: {
                 readonly nullable: true;
                 readonly type: {
@@ -1126,6 +1140,7 @@ type ContractBase = Omit<
                 readonly image: { readonly column: 'image' };
                 readonly name: { readonly column: 'name' };
                 readonly rescue: { readonly column: 'rescue' };
+                readonly socialLink: { readonly column: 'socialLink' };
                 readonly startDate: { readonly column: 'startDate' };
                 readonly status: { readonly column: 'status' };
                 readonly updatedAt: { readonly column: 'updatedAt' };

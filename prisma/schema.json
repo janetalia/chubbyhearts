@@ -264,6 +264,13 @@
                   "kind": "scalar"
                 }
               },
+              "socialLink": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "startDate": {
                 "nullable": true,
                 "type": {
@@ -355,6 +362,9 @@
                 },
                 "rescue": {
                   "column": "rescue"
+                },
+                "socialLink": {
+                  "column": "socialLink"
                 },
                 "startDate": {
                   "column": "startDate"
@@ -830,6 +840,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "socialLink": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "startDate": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "nativeType": "timestamptz",
@@ -1093,7 +1108,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1be88a680d30a0e1a502e59bd0a62e934afe1fc6c8245881f99e0e81448b1653"
+    "storageHash": "26b5d49868e3915fa430b55e069909c0a087f15462926350fa76de450be5f382"
   },
   "execution": {
     "executionHash": "1a601b500281f583ea3639d91321af2285389447a700847aba4061d671d02d57",

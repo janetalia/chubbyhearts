@@ -100,3 +100,8 @@ export async function registerWithPassword(
 
   redirect("/signin?registered=1");
 }
+
+export async function checkEmailExists(email: string): Promise<boolean> {
+  const existingUser = await db.orm.public.User.where({ email: email.toLowerCase() }).first();
+  return !!existingUser;
+}

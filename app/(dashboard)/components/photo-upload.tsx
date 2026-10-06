@@ -46,7 +46,7 @@ export default function PhotoUpload({
   const defaultBg = hasBgOverride ? "" : (compact ? "bg-white" : "bg-[#edeac8]");
 
   return <div className="relative">
-    {isEdit?<Image src='/Vector.svg' alt='vector image' height={200} width={200} className="absolute top-0 right-0 size-44 z-10" />:''}
+    {/* {isEdit?<Image src='/Vector.svg' alt='vector image' height={200} width={200} className="absolute top-0 right-0 size-44 z-10" />:''} */}
     
     <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Upload pet photo" className="sr-only" onChange={event => void upload(event.target.files?.[0])} />
     <button
@@ -73,7 +73,7 @@ export default function PhotoUpload({
       className="object-cover"
     />}
     <span className="absolute bottom-4 left-3 flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs">
-      <Camera className="size-3" />Change photo</span></> : <><span className="flex size-14 items-center justify-center rounded-full bg-white shadow-sm"><Camera className="size-[22px]" /></span><span className="mt-3 text-sm font-semibold">{busy ? "Uploading..." : compact ? "Upload photo" : "Add photo"}</span><span className="text-xs leading-5 text-muted-foreground">{compact ? "JPG, PNG · Max 10MB" : "Tap to upload"}</span></>}
+      <Camera className="size-3" />Change photo</span></> : <><span className="flex size-14 items-center justify-center rounded-full bg-white shadow-sm"><Camera className="size-5.5" /></span><span className="mt-3 text-sm font-semibold">{busy ? "Uploading..." : compact ? "Upload photo" : "Add photo"}</span><span className="text-xs leading-5 text-muted-foreground">{compact ? "JPG, PNG · Max 10MB" : "Tap to upload"}</span></>}
     </button>
     {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
     

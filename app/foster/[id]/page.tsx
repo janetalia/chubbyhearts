@@ -76,15 +76,26 @@ export default async function PublicFosterPage({ params }: { params: Promise<{ i
               </p>
             </div>
 
-            {foster.adoptionLink && (
-              <Button
-                render={<Link href={foster.adoptionLink} target="_blank" rel="noreferrer" />}
-                className="mt-8 h-12 rounded-[14px] px-6 text-base"
-              >
-                <ExternalLink className="size-4" />
-                Adoption Application
-              </Button>
-            )}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              {foster.socialLink && (
+                <Button
+                  render={<Link href={foster.socialLink} target="_blank" rel="noreferrer" />}
+                  className="h-12 flex-1 rounded-[14px] px-6 text-base bg-[#e05a3a] hover:bg-[#c94d30]"
+                >
+                  <ExternalLink className="size-4" />
+                  Social Media
+                </Button>
+              )}
+              {foster.adoptionLink && (
+                <Button
+                  render={<Link href={foster.adoptionLink} target="_blank" rel="noreferrer" />}
+                  className="h-12 flex-1 rounded-[14px] px-6 text-base"
+                >
+                  <ExternalLink className="size-4" />
+                  Adoption Application
+                </Button>
+              )}
+            </div>
           </section>
         </Card>
       </div>

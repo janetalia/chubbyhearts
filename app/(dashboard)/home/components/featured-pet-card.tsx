@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Archive, Copy, MoreHorizontal, Pencil } from "lucide-react";
+import { Archive, Copy, MoreHorizontal, Pencil, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
   ];
 
   const toggleCard = () => setFlippedFosterId(current => current === foster.id ? null : foster.id);
+
   async function handleArchive() {
     setPending(true);
     setError("");
@@ -56,6 +57,34 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
     router.push(`/share/${foster.id}`);
   }
 
+  // Same menu, rendered on both the front and back faces of the card.
+  const renderMenu = (className: string) => (
+    <div
+      className={className}
+      onClick={event => event.stopPropagation()}
+    >
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              size="icon"
+              aria-label={`More options for ${foster.name}`}
+              title="Card options"
+              className="size-8 rounded-full bg-white text-[#6f6b65] md:bg-primary md:text-white"
+            />
+          }
+        >
+          <MoreHorizontal className="size-5" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48 p-2">
+          <DropdownMenuItem onClick={() => router.push(`/edit-card/${foster.id}`)} className="gap-3 p-3"><Pencil />Edit Card</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCopyShare} className="gap-3 p-3"><Copy />Copy Share Link</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleArchive} disabled={pending} className="gap-3 p-3"><Archive />Archive Card</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+
   return <section className="mt-3.5 md:mt-5.5">
     <div className="perspective-[1400px]">
       <div
@@ -70,8 +99,9 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             toggleCard();
           }
         }}
-        className={`relative min-h-130 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
+        className={`relative min-h-150 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
       >
+        {/* FRONT FACE */}
         <Card className="absolute inset-0 flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:flex-row">
           <div className="relative h-64.25 shrink-0 overflow-hidden bg-secondary md:h-101 md:w-[32%]">
             {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-cover md:block" : "object-cover"} priority />}
@@ -81,17 +111,11 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             </div>
             <Image src="/Vector.svg" alt="" width={108} height={109} className="absolute right-0 -top-10" />
           </div>
+
+          {/* Menu: direct child of the absolute Card, so it anchors to the card's top-right */}
+          {renderMenu("absolute right-4.5 top-4.5 z-10 md:right-6 md:top-5")}
+
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 md:gap-15.5 md:p-8.5">
-            <div className="absolute right-4.5 top-4.5 z-10 md:right-6 md:top-5" onClick={event => event.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger render={<Button size="icon" aria-label={`More options for ${foster.name}`} title="Card options" className="size-8 rounded-full bg-white text-[#6f6b65] md:bg-primary md:text-white" />}><MoreHorizontal className="size-5" /></DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 p-2">
-                  <DropdownMenuItem onClick={() => router.push(`/edit-card/${foster.id}`)} className="gap-3 p-3"><Pencil />Edit Card</DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleCopyShare} className="gap-3 p-3"><Copy />Copy Share Link</DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleArchive} disabled={pending} className="gap-3 p-3"><Archive />Archive Card</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
             <div>
               <h1 className="font-heading text-[32px] font-bold leading-10.5 text-[#1a1a1a] md:text-[51px] md:leading-14">{foster.name}</h1>
               <p className="pt-2 text-base font-semibold leading-7 text-[#e05a3a] md:pt-1.5 md:text-[20px]">{foster.rescue}</p>
@@ -104,18 +128,24 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
           </div>
         </Card>
 
+        {/* BACK FACE (details view) */}
         <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
-          <div>
-            {/* <div className="flex justify-end">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-[#e05a3a]">
-                <RotateCcw className="size-5" />
-              </div>
-            </div> */}
+          {/* Desktop: menu pinned to the top-right corner */}
+          {renderMenu("absolute right-6 top-5 z-10 hidden md:block")}
 
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="grid shrink-0 gap-3 md:grid-cols-3">
               {detailItems.map(item => (
                 <div key={item.label}>
-                  <p className="text-[13px] font-semibold leading-5">{item.label}</p>
+                  {item.label === "Age" ? (
+                    /* Mobile: "Age" label and menu on the same row, justify-between */
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] font-semibold leading-5">{item.label}</p>
+                      {renderMenu("md:hidden")}
+                    </div>
+                  ) : (
+                    <p className="text-[13px] font-semibold leading-5">{item.label}</p>
+                  )}
                   <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
                     <p className="text-sm leading-6 text-[#6b6b6b]">{item.value || "Not added yet"}</p>
                   </div>
@@ -123,17 +153,20 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
               ))}
             </div>
 
-            <div className="mt-5">
-              <p className="text-[13px] font-semibold leading-5">About them</p>
-              <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
-                <p className="max-h-45 overflow-y-auto text-sm leading-6 text-[#4a4a4a] md:max-h-32.5">
+            <div className="mt-5 flex min-h-0 flex-1 flex-col">
+              <p className="shrink-0 text-[13px] font-semibold leading-5">About them</p>
+              <div
+                className="mt-2 min-h-0 flex-1 overflow-y-auto rounded-[16px] border border-input bg-white px-4 py-3.5"
+                onClick={event => event.stopPropagation()}
+              >
+                <p className="break-words text-sm leading-6 text-[#4a4a4a]">
                   {foster.about || "No about details have been added yet."}
                 </p>
               </div>
             </div>
           </div>
 
-          <p className="mt-5 text-center text-xs font-semibold text-[#8a8a8a]">Click the card to flip back</p>
+          <p className="mt-5 shrink-0 text-center text-xs font-semibold text-[#8a8a8a]">Click the card to flip back</p>
         </Card>
       </div>
     </div>

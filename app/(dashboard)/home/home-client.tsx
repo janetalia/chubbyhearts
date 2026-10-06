@@ -51,25 +51,25 @@ export default function HomeClient({ fosters }: { fosters: HomePet[] }) {
               height={109}
               className="absolute -right-1 -top-10 opacity-90"
             />
-            <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white px-4 py-1.5 shadow">
-              <span className="size-3 rounded-full bg-[#4caf50]" />
-              <span className="text-sm font-semibold text-[#e05a3a]">Ready when you are</span>
-            </div>
           </div>
 
-          <div className="flex min-w-0 flex-col justify-center p-2 pt-6 md:p-[34px]">
+          <div className="flex min-w-0 flex-col justify-center p-2 pt-6 md:p-8.5">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#fff1e9] px-3 py-1 text-xs font-semibold text-[#e05a3a]">
               <Heart className="size-3.5 fill-[#fb2c36] text-[#fb2c36]" />
               Foster cards
             </div>
-            <h1 className="mt-4 font-heading text-[34px] font-bold leading-[40px] text-[#1a1a1a] md:text-[51px] md:leading-[56px]">
-              No active fosters yet
+            <h1 className="mt-4 font-heading text-[34px] font-bold leading-10 text-[#1a1a1a] md:text-[51px] md:leading-14">
+              No active fosters
             </h1>
-            <p className="mt-3 max-w-[520px] text-sm leading-6 text-[#6f6b65] md:text-base md:leading-7">
-              Create your first foster card, then you can edit it, archive it, and share a public profile link from this home screen.
+            <p className="mt-3 max-w-130 text-sm leading-6 text-[#6f6b65] md:text-base md:leading-7">
+               Add a
+pet you're fostering to
+get started. You can
+edit, archive, or share
+the card anytime
             </p>
 
-            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+            <div className="mt-6 grid gap-2">
               <Link
                 href="/create-card"
                 className="flex h-12 items-center justify-center gap-2 rounded-[16px] bg-primary px-6 text-base font-medium text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-primary/90 md:rounded-[12px]"
@@ -77,10 +77,7 @@ export default function HomeClient({ fosters }: { fosters: HomePet[] }) {
                 <Plus className="size-4" />
                 Create Card
               </Link>
-              <div className="flex h-12 items-center justify-center gap-2 rounded-[16px] border border-[#ede9e4] bg-[#fffaf2] px-4 text-sm font-semibold text-[#6f6b65] md:rounded-[12px]">
-                <Share2 className="size-4 text-[#e05a3a]" />
-                Share after saving
-              </div>
+             
             </div>
           </div>
         </div>

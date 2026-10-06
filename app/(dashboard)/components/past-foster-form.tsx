@@ -76,7 +76,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
 
     toast.success("Past foster added");
     setDraft(emptyPastFoster);
-    router.refresh();
+    router.push("/my-foster-family");
   }
 
   async function removePastFoster(id: string, name: string) {
@@ -115,7 +115,6 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
           />
           <div className="flex-1">
             <FormField
-              className="col-span-2"
               label="Pet's name"
               placeholder="Enter pet's name"
               required
@@ -124,7 +123,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
               maxLength={80}
             />
             <FormField
-              className="col-span-2"
+              className="mt-5"
               label="Rescue"
               placeholder="Enter Rescue name"
               required
@@ -132,7 +131,31 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
               onChange={(e) => update("rescue", e.target.value)}
               maxLength={120}
             />
-            <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+            <FormField
+              className="mt-5"
+              label="Breed"
+              placeholder="Enter breed"
+              value={draft.breed}
+              onChange={(e) => update("breed", e.target.value)}
+              maxLength={80}
+            />
+            <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+              <FormField
+                label="Age"
+                placeholder="Enter age"
+                value={draft.age}
+                onChange={(e) => update("age", e.target.value)}
+                maxLength={20}
+              />
+              <FormField
+                label="Weight"
+                placeholder="Enter weight"
+                value={draft.weight}
+                onChange={(e) => update("weight", e.target.value)}
+                maxLength={20}
+              />
+            </div>
+            <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <FormField
                 placeholder=""
                 label="Start date"
@@ -170,7 +193,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
             variant="outline"
             onClick={addPastFoster}
             disabled={pending}
-            className="w-full sm:w-fit h-[44px] shrink-0 rounded-[12px] border-[#D96F61] px-5 text-[#D96F61] hover:bg-[#D96F61]/5 hover:text-[#D96F61]"
+            className="w-full sm:w-fit h-11 shrink-0 rounded-[12px] border-[#D96F61] px-5 text-[#D96F61] hover:bg-[#D96F61]/5 hover:text-[#D96F61]"
           >
             <Plus className="size-4" /> {pending ? "Saving..." : "Add past foster"}
           </Button>

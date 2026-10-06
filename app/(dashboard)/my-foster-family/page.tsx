@@ -14,6 +14,13 @@ export default async function MyFosterFamilyPage() {
     .where({ userId: session.user.id, status: "PAST" })
     .all();
 
+  // Sort chronologically (newest first based on endDate, then startDate)
+  pets.sort((a, b) => {
+    const timeA = (a.endDate as any)?.epochMilliseconds || (a.startDate as any)?.epochMilliseconds || 0;
+    const timeB = (b.endDate as any)?.epochMilliseconds || (b.startDate as any)?.epochMilliseconds || 0;
+    return timeB - timeA;
+  });
+
   return <MyFosterFamilyClient pastFosters={pets.map(toFosterFamilyPet)} />;
 }
 

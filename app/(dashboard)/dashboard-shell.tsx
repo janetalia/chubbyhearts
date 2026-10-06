@@ -35,13 +35,13 @@ export default function DashboardShell({
         <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
           <DialogContent
             showCloseButton={false}
-            className="!inset-y-0 !left-0 !top-0 !h-dvh !w-[288px] !max-w-[85vw] !translate-x-0 !translate-y-0 !rounded-none !p-0"
+            className="inset-y-0! left-0! top-0! h-dvh! w-[288px]! max-w-[85vw]! translate-x-0! translate-y-0! rounded-none! p-0!"
           >
             <DialogTitle className="sr-only">Navigation</DialogTitle>
             <Sidebar open onToggle={() => setMobileOpen(false)} mobile />
           </DialogContent>
         </Dialog>
-        <main className="dashboard-main min-w-0 px-5 pb-12 pt-[96px] md:px-[35px] md:pt-[106px]">
+        <main className="dashboard-main min-w-0 px-5 pb-12 pt-24 md:px-8.75 md:pt-26.5">
           {children}
         </main>
       </div>

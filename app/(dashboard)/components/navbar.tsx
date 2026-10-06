@@ -12,7 +12,7 @@ export default function Navbar({
   onToggleSidebar: () => void;
 }) {
   return (
-    <header className="dashboard-navbar fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between bg-white px-5 md:h-[79px] md:border-b md:border-border md:px-6">
+    <header className="dashboard-navbar fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between bg-white px-5 md:h-19.75 md:border-b md:border-border md:px-6">
       <div className="flex min-w-0 items-center gap-3 md:gap-6">
         <Button
           variant="ghost"
@@ -22,7 +22,7 @@ export default function Navbar({
           aria-label="Open navigation"
           onClick={onToggleSidebar}
         >
-          <Menu className="size-[24px]" />
+          <Menu className="size-6" />
         </Button>
         <Link href="/home" className="mobile-brand shrink-0">
           <Image
@@ -31,7 +31,7 @@ export default function Navbar({
             width={160}
             height={47}
             priority
-            className="h-[42px] w-[144px] md:h-[47px] md:w-[160px]"
+            className="h-10.5 w-36 md:h-11.75 md:w-40"
           />
         </Link>
       </div>

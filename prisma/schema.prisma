@@ -68,6 +68,7 @@ model Pet {
   age          String?
   weight       String?
   breed        String?
+  socialLink   String?
   about        String?
   adoptionLink String?
   status       PetStatus @default(ACTIVE)

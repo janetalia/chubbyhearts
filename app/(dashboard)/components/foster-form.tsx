@@ -1,12 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { emptyFoster, type Foster } from "@/lib/fosters";
-import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { createFoster } from "./foster-actions";
 import FormField from "./form-field";
+import { createFoster } from "./foster-actions";
 import PhotoUpload from "./photo-upload";
 
 export default function FosterForm({ foster }: { foster?: Foster }) {
@@ -34,10 +33,10 @@ export default function FosterForm({ foster }: { foster?: Foster }) {
     router.push(result.redirectTo);
     router.refresh();
   }
-  return <form onSubmit={submit} className="max-w-[1239px]">
-    <div className="flex min-h-[53px] items-center justify-between gap-3">
+  return <form onSubmit={submit} className="max-w-309.75">
+    <div className="flex min-h-13.25 items-center justify-between gap-3">
       <h1 className="text-xl font-semibold leading-8">{foster ? "Edit Card" : "Create a Card"}</h1>
-      <Button type="submit" disabled={pending} className="hidden h-[53px] rounded-[16px] px-[34px] shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
+      <Button type="submit" disabled={pending} className="hidden h-13.25 rounded-[16px] px-8.5 shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
     {/* main form */}
     <div className={`mt-5 ${foster ? "grid gap-6 lg:grid-cols-2" : ""}`}>
@@ -49,15 +48,19 @@ export default function FosterForm({ foster }: { foster?: Foster }) {
           <FormField label="Age" placeholder="e.g. 2 years" value={draft.age} onChange={e => update("age", e.target.value)} maxLength={40} />
           <FormField label="Weight" placeholder="e.g. 52 lbs" value={draft.weight} onChange={e => update("weight", e.target.value)} maxLength={40} />
           <FormField label="Breed" placeholder="e.g. Golden Retriever Mix" value={draft.breed} onChange={e => update("breed", e.target.value)} maxLength={80} />
-          <FormField label="Adoption application link" placeholder="Link to an adoption application or the rescue's site" type="url" value={draft.adoptionLink} onChange={e => update("adoptionLink", e.target.value)} maxLength={300} />
+          <FormField label="Social Media Link" placeholder="Add a social link" type="url" value={draft.socialLink} onChange={e => update("socialLink", e.target.value)} maxLength={300} />
         </div>
-        <label className="mt-5 block"><span className="text-[13px] font-semibold leading-5">About them</span><textarea value={draft.about} onChange={e => update("about", e.target.value)} maxLength={500} placeholder="Add a couple sentences about your foster pet that show their true personality!" className="mt-2 h-[114px] w-full resize-y rounded-2xl border border-input bg-white px-4 py-3.5 text-sm outline-none placeholder:text-[#bfbbb5] focus:ring-2 focus:ring-primary/30" /></label>
+               <div className="mt-5">
+
+        <FormField className="col-span-2 mt-5" label="Adoption application link" placeholder="Link to an adoption application or the rescue's site" type="url" value={draft.adoptionLink} onChange={e => update("adoptionLink", e.target.value)} maxLength={300} />
+               </div>
+        <label className="mt-5 block"><span className="text-[13px] font-semibold leading-5">About them</span><textarea value={draft.about} onChange={e => update("about", e.target.value)} maxLength={500} placeholder="Add a couple sentences about your foster pet that show their true personality!" className="mt-2 h-28.5 w-full resize-y rounded-2xl border border-input bg-white px-4 py-3.5 text-sm outline-none placeholder:text-[#bfbbb5] focus:ring-2 focus:ring-primary/30" /></label>
       </div>
     </div>
     {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
     <div className="mt-4 flex flex-col gap-3 md:flex-row">
-      <Button type="submit" disabled={pending} className="h-[53px] rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
+      <Button type="submit" disabled={pending} className="h-13.25 rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
-      <div className="py-3 text-center text-[12px] text-[#9A9A9A] hover:underline flex items-center gap-2 justify-center"> <MapPin className="size-4"/> <span>Tap a card behind to bring it to front</span></div>
+     
   </form>;
 }
