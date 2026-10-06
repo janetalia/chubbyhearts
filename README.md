@@ -1,6 +1,6 @@
 This is the Jlturner Foster Family official github repository, provided By ELEVATE IT
 
-## Getting Started
+## Getting Started:
 
 First, run the development server
 
