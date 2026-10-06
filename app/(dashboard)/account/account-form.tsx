@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useMemo, useState } from "react";
-import { Calendar, KeyRound, Mail, Save } from "lucide-react";
+import { Calendar, Camera, KeyRound, Mail, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -65,10 +65,7 @@ export default function AccountForm({
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Account updated", {
-        description: state.success,
-        id: "account-updated",
-      });
+      toast.success("Account updated successfully.");
     }
 
     if (state.error) {
@@ -164,16 +161,19 @@ export default function AccountForm({
                 <span className="text-[13px] font-semibold leading-5 text-[#252525]">
                   Profile image
                 </span>
-                <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_auto]">
-                  <Input
-                    type="url"
-                    value={profileImage.startsWith("data:") ? "" : profileImage}
-                    onChange={(event) => setProfileImage(event.target.value)}
-                    placeholder="https://example.com/profile.jpg"
-                    className="h-[51px] rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
-                  />
-                  <label className="inline-flex h-[51px] cursor-pointer items-center justify-center rounded-[16px] border border-[#e9e5de] px-4 text-sm font-semibold text-[#252525] hover:bg-[#f9f5eb]">
-                    Upload
+                <div className="mt-2 flex">
+                  <label className="group relative inline-flex cursor-pointer flex-col items-center justify-center">
+                    {profileImage ? (
+                      <div className="flex flex-col items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={profileImage} alt="Profile preview" className="size-[88px] rounded-full object-cover border border-[#ede9e4]" />
+                        <span className="text-sm font-semibold text-[#e05a3a] group-hover:underline">Change photo</span>
+                      </div>
+                    ) : (
+                      <div className="flex size-[88px] items-center justify-center rounded-full border border-dashed border-[#d2cec9] bg-[#f9f5eb] text-[#a19d98] hover:bg-[#f0ebe0]">
+                        <Camera className="size-6" />
+                      </div>
+                    )}
                     <input
                       type="file"
                       accept="image/*"
