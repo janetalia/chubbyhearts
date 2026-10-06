@@ -1,4 +1,4 @@
-This is the Jlturner Foster Family official github repository, provided By ELEVATE IT
+This is the Jlturner Foster Family official github repository, provided BY ELEVATE IT
 
 ## Getting Started:
 
