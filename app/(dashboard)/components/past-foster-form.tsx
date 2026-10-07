@@ -96,7 +96,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
   }
 
   return (
-    <div className="max-w-[1239px]">
+    <div className="max-w-309.75">
       <h1 className="text-xl md:text-2xl font-semibold md:font-bold leading-8">
         Add a Past Foster (Backfill)
       </h1>

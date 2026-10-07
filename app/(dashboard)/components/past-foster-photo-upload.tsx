@@ -56,22 +56,14 @@ export default function PastFosterPhotoUpload({
       className={`relative flex flex-col items-center justify-center overflow-hidden rounded-[12px] border-2 border-dashed w-full md:w-95 border-[#e9e5de] ${defaultHeight} ${defaultBg} ${className}`}
     >
       {value ? <> 
-      {isEdit?<Image
-      src={value}
-      alt="Pet photo"
-      // unoptimized
-      // sizes="(max-width: 767px) 60vw, 400px"
-      height={100}
-      width={100}
-      className="h-80 w-80"
-    />:<Image
-      src={value}
-      alt="Pet photo"
-      fill
-      unoptimized
-      sizes="(max-width: 767px) 60vw, 601px"
-      className="object-cover"
-    />}
+      <Image
+        src={value}
+        alt="Pet photo"
+        fill
+        unoptimized
+        sizes="(max-width: 767px) 60vw, 601px"
+        className="object-cover"
+      />
     <span className="absolute bottom-4 left-3 flex items-center gap-2 text-xs">
       <Camera className="size-3" />Upload photo</span></> : 
       <>

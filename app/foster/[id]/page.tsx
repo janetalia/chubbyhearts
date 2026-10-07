@@ -41,7 +41,7 @@ export default async function PublicFosterPage({
         {foster.status === "past" ? (
           <Card className="mt-6 flex min-h-[400px] flex-col items-center justify-center overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-12 text-center shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
             <Image 
-              src="/avatar/DogIllustration.svg" 
+              src="/avatar/Image (Pet).svg" 
               alt="Archived Foster Illustration" 
               width={160} 
               height={160} 
@@ -50,9 +50,6 @@ export default async function PublicFosterPage({
             <h1 className="text-2xl font-bold text-[#1a1a1a]">
               This card is no longer active.
             </h1>
-            <p className="mt-3 text-sm text-[#8a8178]">
-              {foster.name} has been archived by their foster family.
-            </p>
           </Card>
         ) : (
           <Card className="mt-6 overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-0 shadow-[0_12px_32px_rgba(0,0,0,0.08)] md:grid md:grid-cols-[0.9fr_1.1fr]">

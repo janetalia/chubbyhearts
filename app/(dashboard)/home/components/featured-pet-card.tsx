@@ -1,16 +1,16 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Archive, Copy, MoreHorizontal, Pencil, RotateCcw } from "lucide-react";
+import { Archive, Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { HomePet } from "../home-client";
-import { archivePet } from "../actions";
+import { archivePet, deletePet } from "../actions";
 
-export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
+export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet, onRemove?: (id: string) => void }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -39,7 +39,28 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
       toast.success("Foster archived", {
         description: `${foster.name} moved to your foster family.`,
       });
-      router.refresh();
+      onRemove?.(foster.id);
+    }
+
+    setPending(false);
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(`Are you sure you want to permanently delete ${foster.name}? This action cannot be undone.`)) {
+      return;
+    }
+
+    setPending(true);
+    setError("");
+
+    const result = await deletePet(foster.id);
+
+    if (result?.error) {
+      setError(result.error);
+      toast.error("Delete failed", { description: result.error });
+    } else {
+      toast.success("Foster card deleted");
+      onRemove?.(foster.id);
     }
 
     setPending(false);
@@ -80,12 +101,15 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
           <DropdownMenuItem onClick={() => router.push(`/edit-card/${foster.id}`)} className="gap-3 p-3"><Pencil />Edit Card</DropdownMenuItem>
           <DropdownMenuItem onClick={handleCopyShare} className="gap-3 p-3"><Copy />Copy Share Link</DropdownMenuItem>
           <DropdownMenuItem onClick={handleArchive} disabled={pending} className="gap-3 p-3"><Archive />Archive Card</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDelete} disabled={pending} className="gap-3 p-3 text-destructive focus:bg-destructive/10 focus:text-destructive"><Trash2 />Delete Card</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 
-  return <section className="mt-3.5 md:mt-5.5">
+  return <section className="relative mt-3.5 md:mt-5.5">
+    {/* Single Menu pinned to the top-right corner, outside the 3D transform to prevent positioning bugs */}
+    {renderMenu("absolute right-4.5 top-4.5 z-20 md:right-6 md:top-5")}
     <div className="perspective-[1400px]">
       <div
         role="button"
@@ -99,10 +123,10 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             toggleCard();
           }
         }}
-        className={`relative min-h-150 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
+        className={`relative min-h-0 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
       >
         {/* FRONT FACE */}
-        <Card className="absolute inset-0 flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:flex-row">
+        <Card className="relative flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:absolute md:inset-0 md:flex-row">
           <div className="relative h-64.25 shrink-0 overflow-hidden bg-secondary md:h-101 md:w-[32%]">
             {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-cover md:block" : "object-cover"} priority />}
             {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="100vw" className="object-cover md:hidden" priority />}
@@ -111,11 +135,8 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
             </div>
             <Image src="/Vector.svg" alt="" width={108} height={109} className="absolute right-0 -top-10" />
           </div>
-
-          {/* Menu: direct child of the absolute Card, so it anchors to the card's top-right */}
-          {renderMenu("absolute right-4.5 top-4.5 z-10 md:right-6 md:top-5")}
-
-          <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 md:gap-15.5 md:p-8.5">
+          
+<div className="flex min-w-0 flex-col justify-start gap-2 p-4 md:flex-1 md:justify-center md:gap-15.5 md:p-8.5">
             <div>
               <h1 className="font-heading text-[32px] font-bold leading-10.5 text-[#1a1a1a] md:text-[51px] md:leading-14">{foster.name}</h1>
               <p className="pt-2 text-base font-semibold leading-7 text-[#e05a3a] md:pt-1.5 md:text-[20px]">{foster.rescue}</p>
@@ -130,22 +151,11 @@ export default function FeaturedPetCard({ foster }: { foster: HomePet }) {
 
         {/* BACK FACE (details view) */}
         <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
-          {/* Desktop: menu pinned to the top-right corner */}
-          {renderMenu("absolute right-6 top-5 z-10 hidden md:block")}
-
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col pt-6 md:pt-0">
             <div className="grid shrink-0 gap-3 md:grid-cols-3">
               {detailItems.map(item => (
                 <div key={item.label}>
-                  {item.label === "Age" ? (
-                    /* Mobile: "Age" label and menu on the same row, justify-between */
-                    <div className="flex items-center justify-between">
-                      <p className="text-[13px] font-semibold leading-5">{item.label}</p>
-                      {renderMenu("md:hidden")}
-                    </div>
-                  ) : (
-                    <p className="text-[13px] font-semibold leading-5">{item.label}</p>
-                  )}
+                  <p className="text-[13px] font-semibold leading-5">{item.label}</p>
                   <div className="mt-2 rounded-[16px] border border-input bg-white px-4 py-3.5">
                     <p className="text-sm leading-6 text-[#6b6b6b]">{item.value || "Not added yet"}</p>
                   </div>

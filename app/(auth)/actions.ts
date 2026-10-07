@@ -98,7 +98,20 @@ export async function registerWithPassword(
     updatedAt: now,
   });
 
-  redirect("/signin?registered=1");
+  try {
+    await signIn("credentials", {
+      email: email,
+      password: parsed.data.password,
+      redirectTo: "/home",
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: authErrorMessage(error) };
+    }
+    throw error;
+  }
+
+  return {};
 }
 
 export async function checkEmailExists(email: string): Promise<boolean> {

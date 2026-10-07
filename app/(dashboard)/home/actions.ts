@@ -30,3 +30,26 @@ export async function archivePet(id: string) {
 
   return { success: "Foster archived." };
 }
+
+export async function deletePet(id: string) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: "You must be signed in to delete a foster." };
+  }
+
+  const pet = await db.orm.public.Pet
+    .where({ id, userId: session.user.id })
+    .first();
+
+  if (!pet) {
+    return { error: "Foster card not found." };
+  }
+
+  await db.orm.public.Pet.where({ id }).delete();
+
+  revalidatePath("/home");
+  revalidatePath("/my-foster-family");
+
+  return { success: "Foster card deleted." };
+}

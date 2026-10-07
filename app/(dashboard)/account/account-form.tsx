@@ -40,28 +40,10 @@ export default function AccountForm({
   const [state, formAction, pending] = useActionState(updateAccount, {});
   const [profileImage, setProfileImage] = useState(user.image || "");
   const displayName = user.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || "Your account";
-  const profilePreview = profileImage || "/avatar/Image (Bella).svg";
+  const profilePreview = profileImage || "/avatar/DogIllustration.svg";
   const memberSince = useMemo(() => formatMemberSince(user.createdAt), [user.createdAt]);
 
-  function handleProfileFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid image", {
-        description: "Choose an image file for your profile photo.",
-      });
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setProfileImage(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
-  }
 
   useEffect(() => {
     if (state.success) {
@@ -133,13 +115,13 @@ export default function AccountForm({
               <FormField
                 label="First name"
                 name="firstName"
-                placeholder="JL"
+                placeholder="First name"
                 defaultValue={user.firstName || ""}
               />
               <FormField
                 label="Last name"
                 name="lastName"
-                placeholder="Turner"
+                placeholder="Last name"
                 defaultValue={user.lastName || ""}
               />
               <FormField
@@ -157,33 +139,7 @@ export default function AccountForm({
                 placeholder="(555) 219-8044"
                 defaultValue={user.phone || ""}
               />
-              <div className="block md:col-span-2">
-                <span className="text-[13px] font-semibold leading-5 text-[#252525]">
-                  Profile image
-                </span>
-                <div className="mt-2 flex">
-                  <label className="group relative inline-flex cursor-pointer flex-col items-center justify-center">
-                    {profileImage ? (
-                      <div className="flex flex-col items-center gap-2">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={profileImage} alt="Profile preview" className="size-[88px] rounded-full object-cover border border-[#ede9e4]" />
-                        <span className="text-sm font-semibold text-[#e05a3a] group-hover:underline">Change photo</span>
-                      </div>
-                    ) : (
-                      <div className="flex size-[88px] items-center justify-center rounded-full border border-dashed border-[#d2cec9] bg-[#f9f5eb] text-[#a19d98] hover:bg-[#f0ebe0]">
-                        <Camera className="size-6" />
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfileFile}
-                      className="sr-only"
-                    />
-                  </label>
-                </div>
-                <input type="hidden" name="image" value={profileImage} />
-              </div>
+             
             </div>
           </Card>
         </div>

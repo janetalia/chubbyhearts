@@ -59,20 +59,18 @@ export default function SigninCard() {
     <main className="flex min-h-[calc(100vh-81px)] items-center justify-center px-5 py-10">
       <section className="w-full max-w-104.5 rounded-[37px] bg-white px-8 pb-6 pt-8.5">
         <div className="flex flex-col items-center gap-4.25">
-          <Image
+          <img
             src="/logo/image 35.svg"
             alt=""
-            width={336}
-            height={218}
-            priority
+            width="336"
+            height="218"
             className="h-40 sm:h-54.5 w-64 sm:w-84 max-w-full object-contain"
           />
-          <Image
+          <img
             src="/logo/image 34.svg"
             alt="Chubby Hearts"
-            width={230}
-            height={109}
-            priority
+            width="230"
+            height="109"
             className="h-20 sm:h-27.25 w-44 sm:w-57.5 object-contain"
           />
         </div>

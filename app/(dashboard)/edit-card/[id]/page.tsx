@@ -5,7 +5,7 @@ import { db } from "@/lib/prisma";
 import { petToFoster } from "@/lib/pet-mappers";
 import FosterEditForm from "../../components/foster-edit-form";
 
-export default async function EditCardPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditCardPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ unarchive?: string }> }) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -13,12 +13,13 @@ export default async function EditCardPage({ params }: { params: Promise<{ id: s
   }
 
   const { id } = await params;
+  const { unarchive } = await searchParams;
   const pet = await db.orm.public.Pet
     .where({ id, userId: session.user.id })
     .first();
 
   return pet ? (
-    <FosterEditForm key={pet.id} foster={petToFoster(pet)} />
+    <FosterEditForm key={pet.id} foster={petToFoster(pet)} isUnarchiving={unarchive === "true"} />
   ) : (
     <div>
       <h1 className="text-xl font-semibold">Card not found</h1>

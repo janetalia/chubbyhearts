@@ -8,7 +8,7 @@ import FormField from "./form-field";
 import { updateFoster } from "./foster-actions";
 import PhotoUpload from "./photo-upload";
 
-export default function FosterEditForm({ foster }: { foster?: Foster }) {
+export default function FosterEditForm({ foster, isUnarchiving }: { foster?: Foster; isUnarchiving?: boolean }) {
   const [draft, setDraft] = useState<Foster>(foster ?? emptyFoster);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -18,10 +18,15 @@ export default function FosterEditForm({ foster }: { foster?: Foster }) {
     event.preventDefault();
     if (!draft.name.trim()) { setError("Please enter your pet's name."); return; }
     if (draft.adoptionLink && !/^https?:\/\//i.test(draft.adoptionLink)) { setError("Use an adoption link starting with https:// or http://."); return; }
+    if (isUnarchiving && !draft.adoptionLink?.trim()) { setError("Please provide an adoption application link before reactivating the card."); return; }
     if (!foster?.id) { setError("Foster card not found."); return; }
     setPending(true);
     setError("");
-    const result = await updateFoster(foster.id, { ...draft, name: draft.name.trim() });
+    const result = await updateFoster(foster.id, {
+      ...draft,
+      name: draft.name.trim(),
+      status: isUnarchiving ? "active" : draft.status,
+    });
     setPending(false);
 
     if ("error" in result) {
@@ -36,8 +41,8 @@ export default function FosterEditForm({ foster }: { foster?: Foster }) {
   }
   return <form onSubmit={submit} className="max-w-309.75">
     <div className="flex min-h-13.25 items-center justify-between gap-3">
-      <h1 className="text-xl font-semibold leading-8">{foster ? "Edit Card" : "Create a Card"}</h1>
-      <Button type="submit" disabled={pending} className="hidden h-13.25 rounded-[16px] px-8.5 shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
+      <h1 className="text-xl font-semibold leading-8">{isUnarchiving ? "Reactivate Card" : foster ? "Edit Card" : "Create a Card"}</h1>
+      <Button type="submit" disabled={pending} className="hidden h-13.25 rounded-[16px] px-8.5 shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:inline-flex">{pending ? "Saving..." : isUnarchiving ? "Reactivate Card" : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
     {/* main form */}
     <div className={`mt-5 ${foster ? "grid gap-6 lg:grid-cols-2" : ""}`}>
@@ -63,7 +68,7 @@ export default function FosterEditForm({ foster }: { foster?: Foster }) {
     </div>
     {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
     <div className="mt-4 flex flex-col gap-3 md:flex-row">
-      <Button type="submit" disabled={pending} className="h-13.25 rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{pending ? "Saving..." : foster ? "Save Changes" : "Save Card"}</Button>
+      <Button type="submit" disabled={pending} className="h-13.25 rounded-2xl shadow-[0_4px_8px_rgba(217,111,97,0.3)] md:hidden">{pending ? "Saving..." : isUnarchiving ? "Reactivate Card" : foster ? "Save Changes" : "Save Card"}</Button>
     </div>
     </form>;
 }

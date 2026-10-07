@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, Plus, Share2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ActiveFosters from "./components/active-fosters";
 import FeaturedPetCard from "./components/featured-pet-card";
 
@@ -22,9 +22,21 @@ export type HomePet = {
   endDate: string;
 };
 
-export default function HomeClient({ fosters }: { fosters: HomePet[] }) {
+export default function HomeClient({ fosters: initialFosters }: { fosters: HomePet[] }) {
+  const [fosters, setFosters] = useState(initialFosters);
+  
+  // Sync state when props change from Next.js server action revalidatePath
+  useEffect(() => {
+    setFosters(initialFosters);
+  }, [initialFosters]);
+
   const [selectedId, setSelectedId] = useState(fosters[0]?.id ?? "");
-  const selected = fosters.find((foster) => foster.id === selectedId) ?? fosters[0];
+  const selected =
+    fosters.find((foster) => foster.id === selectedId) ?? fosters[0];
+
+  const handleRemoveFoster = (id: string) => {
+    setFosters((prev) => prev.filter((f) => f.id !== id));
+  };
 
   return (
     <div className="max-w-309.75">
@@ -32,10 +44,10 @@ export default function HomeClient({ fosters }: { fosters: HomePet[] }) {
         <ActiveFosters fosters={fosters} onSelect={setSelectedId} />
       )}
       {selected ? (
-        <FeaturedPetCard foster={selected} />
+        <FeaturedPetCard foster={selected} onRemove={handleRemoveFoster} />
       ) : (
         <div className="relative overflow-hidden rounded-[22.5px] border border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.08),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.08)] md:grid md:min-h-[405px] md:grid-cols-[0.92fr_1.08fr] md:p-0">
-          <div className="relative min-h-[260px] overflow-hidden rounded-[18px] bg-[#faf7ef] md:min-h-[405px] md:rounded-none">
+          <div className="relative min-h-65 overflow-hidden rounded-[18px] bg-[#faf7ef] md:min-h-101.25 md:rounded-none">
             <Image
               src="/avatar/DogIllustration.svg"
               alt=""
@@ -62,11 +74,8 @@ export default function HomeClient({ fosters }: { fosters: HomePet[] }) {
               No active fosters
             </h1>
             <p className="mt-3 max-w-130 text-sm leading-6 text-[#6f6b65] md:text-base md:leading-7">
-               Add a
-pet you're fostering to
-get started. You can
-edit, archive, or share
-the card anytime
+              Add a pet you're fostering to get started. You can edit, archive,
+              or share the card anytime
             </p>
 
             <div className="mt-6 grid gap-2">
@@ -77,7 +86,6 @@ the card anytime
                 <Plus className="size-4" />
                 Create Card
               </Link>
-             
             </div>
           </div>
         </div>

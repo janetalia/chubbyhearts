@@ -56,22 +56,14 @@ export default function PhotoUpload({
       className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[24px] border-2 border-dashed border-[#e9e5de] ${defaultHeight} ${defaultBg} ${className}`}
     >
       {value ? <> 
-      {isEdit?<Image
-      src={value}
-      alt="Pet photo"
-      // unoptimized
-      // sizes="(max-width: 767px) 60vw, 400px"
-      height={100}
-      width={100}
-      className="h-80 w-80"
-    />:<Image
-      src={value}
-      alt="Pet photo"
-      fill
-      unoptimized
-      sizes="(max-width: 767px) 60vw, 601px"
-      className="object-cover"
-    />}
+      <Image
+        src={value}
+        alt="Pet photo"
+        fill
+        unoptimized
+        sizes="(max-width: 767px) 60vw, 601px"
+        className="object-cover"
+      />
     <span className="absolute bottom-4 left-3 flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs">
       <Camera className="size-3" />Change photo</span></> : <><span className="flex size-14 items-center justify-center rounded-full bg-white shadow-sm"><Camera className="size-5.5" /></span><span className="mt-3 text-sm font-semibold">{busy ? "Uploading..." : compact ? "Upload photo" : "Add photo"}</span><span className="text-xs leading-5 text-muted-foreground">{compact ? "JPG, PNG · Max 10MB" : "Tap to upload"}</span></>}
     </button>
