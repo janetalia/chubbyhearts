@@ -11,10 +11,10 @@ export type AccountFormState = {
 };
 
 const accountSchema = z.object({
-  firstName: z.string().trim().max(80).optional().default(""),
-  lastName: z.string().trim().max(80).optional().default(""),
-  phone: z.string().trim().max(40).optional().default(""),
-  image: z.string().trim().max(2_000_000).optional().default(""),
+  firstName: z.string().trim().max(80).nullish().default(""),
+  lastName: z.string().trim().max(80).nullish().default(""),
+  phone: z.string().trim().max(40).nullish().default(""),
+  image: z.string().trim().max(2_000_000).nullish().default(""),
 });
 
 export async function updateAccount(
@@ -28,28 +28,47 @@ export async function updateAccount(
   }
 
   const parsed = accountSchema.safeParse({
-    firstName: formData.get("firstName"),
-    lastName: formData.get("lastName"),
-    phone: formData.get("phone"),
-    image: formData.get("image"),
+    firstName: formData.get("firstName") ?? undefined,
+    lastName: formData.get("lastName") ?? undefined,
+    phone: formData.get("phone") ?? undefined,
+    image: formData.get("image") ?? undefined,
   });
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message || "Invalid account details." };
   }
 
-  const firstName = parsed.data.firstName || null;
-  const lastName = parsed.data.lastName || null;
+  const firstName = parsed.data.firstName?.trim() || null;
+  const lastName = parsed.data.lastName?.trim() || null;
+  const phone = parsed.data.phone?.trim() || null;
+  const image = parsed.data.image?.trim() || null;
   const name = [firstName, lastName].filter(Boolean).join(" ") || null;
 
-  await db.orm.public.User.where({ id: session.user.id }).update({
-    firstName,
-    lastName,
-    phone: parsed.data.phone || null,
-    image: parsed.data.image || null,
-    name,
-    updatedAt: nowInstant(),
-  });
+  try {
+    const updateData: {
+      firstName: string | null;
+      lastName: string | null;
+      phone: string | null;
+      name: string | null;
+      updatedAt: ReturnType<typeof nowInstant>;
+      image?: string | null;
+    } = {
+      firstName,
+      lastName,
+      phone,
+      name,
+      updatedAt: nowInstant(),
+    };
+
+    if (formData.has("image")) {
+      updateData.image = image;
+    }
+
+    await db.orm.public.User.where({ id: session.user.id }).update(updateData);
+  } catch (error) {
+    console.error("Failed to update account:", error);
+    return { error: "Failed to update account. Please try again." };
+  }
 
   revalidatePath("/account");
 

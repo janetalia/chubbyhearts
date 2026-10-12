@@ -20,6 +20,17 @@ type VerificationTokenExpiresInput =
   FieldInputTypes["public"]["VerificationToken"]["expires"];
 
 function getBaseUrl(request: Request) {
+  const host =
+    request.headers.get("x-forwarded-host") ||
+    request.headers.get("host");
+  const protocol =
+    request.headers.get("x-forwarded-proto") ||
+    (host?.includes("localhost") || host?.includes("127.0.0.1") ? "http" : "https");
+
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+
   return (
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
     new URL(request.url).origin
@@ -34,7 +45,7 @@ function createResetEmailText(resetUrl: string) {
     "",
     `Reset link: ${resetUrl}`,
     "",
-    "This link expires in 5 minutes.",
+    "This link is valid for 24 hours and can only be used once.",
     "If you did not request this, you can ignore this email.",
     "",
     "Chubby Hearts",
@@ -147,7 +158,7 @@ function createResetEmailHTML(resetUrl: string) {
       <h2>Reset your password</h2>
       <p>We received a request to reset your password. Use the button below to continue.</p>
       <a class="button" href="${resetUrl}">Reset password</a>
-      <div class="notice">This link expires in 5 minutes. If you did not request this, you can ignore this email.</div>
+      <div class="notice">This link is valid for 24 hours and can only be used once. If you did not request this, you can ignore this email.</div>
       <p style="margin-top: 18px;">If the button does not work, copy this link:</p>
       <p class="fallback">${resetUrl}</p>
     </div>
@@ -160,7 +171,7 @@ function createResetEmailHTML(resetUrl: string) {
 
 function createTransporter() {
   const email = process.env.APP_EMAIL?.trim();
-  const password = process.env.APP_PASSWORD?.trim();
+  const password = (process.env.APP_PASSWORD || "").replace(/\s+/g, "").trim();
 
   if (!email || !password) {
     throw new Error("APP_EMAIL and APP_PASSWORD must be set.");
@@ -217,13 +228,22 @@ export async function POST(request: Request) {
   const user = await db.orm.public.User.where({ email }).first();
 
   if (!user) {
-    return Response.json({ data: { message: successMessage } }, { status: 201 });
+    return Response.json(
+      {
+        error: {
+          code: "user_not_found",
+          message:
+            "No account found with this email address. Please make sure you have registered first.",
+        },
+      },
+      { status: 404 },
+    );
   }
 
   const token = createPasswordResetToken();
   const tokenHash = createPasswordResetTokenHash(token);
   const expires = instantFromEpochMilliseconds(
-    Date.now() + 5 * 60 * 1000,
+    Date.now() + 24 * 60 * 60 * 1000,
   ) as VerificationTokenExpiresInput;
   const resetUrl = `${getBaseUrl(request)}/reset-password/verify?token=${token}&email=${encodeURIComponent(email)}`;
 

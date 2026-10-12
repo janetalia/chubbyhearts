@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CalendarDays, Eye, Plus, Search } from "lucide-react";
+import { CalendarDays, Eye, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,12 +38,20 @@ export default function MyFosterFamilyClient({
 }) {
   const { search, setSearch } = useFosterFamilySearch();
   const [selected, setSelected] = useState<FosterFamilyPet | null>(null);
-  const searchValue = search.trim().toLowerCase();
-  const fosters = useMemo(() => {
-    if (!searchValue) return pastFosters;
 
-    return pastFosters.filter((foster) =>
-      [
+  const searchTerms = useMemo(() => {
+    return search
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+  }, [search]);
+
+  const fosters = useMemo(() => {
+    if (searchTerms.length === 0) return pastFosters;
+
+    return pastFosters.filter((foster) => {
+      const searchableFields = [
         foster.name,
         foster.rescue,
         foster.breed,
@@ -52,9 +60,19 @@ export default function MyFosterFamilyClient({
         foster.about,
         foster.startDate,
         foster.endDate,
-      ].some((value) => value.toLowerCase().includes(searchValue)),
-    );
-  }, [pastFosters, searchValue]);
+      ];
+
+      return searchTerms.every((term) =>
+        searchableFields.some((field) =>
+          field ? field.toLowerCase().includes(term) : false,
+        ),
+      );
+    });
+  }, [pastFosters, searchTerms]);
+
+  const handleResetSearch = () => {
+    setSearch("");
+  };
 
   return (
     <div className="max-w-309.75">
@@ -86,56 +104,94 @@ export default function MyFosterFamilyClient({
             </Button>
           </Link>
 
-          {fosters.length !== 0 && (
+          {(pastFosters.length > 0 || search.length > 0) && (
             <div className="relative w-full md:mt-0 md:w-88">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#8a8a8a]" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a8a8a]" />
               <Input
-                type="search"
+                type="text"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    handleResetSearch();
+                  }
+                }}
                 placeholder="Search"
                 aria-label="Search foster family"
-                className="h-10 rounded-[12px] bg-white pl-9 pr-3 text-sm"
+                className="h-10 rounded-[12px] bg-white pl-9.5 pr-9 text-sm focus-visible:ring-1 focus-visible:ring-[#ee9266]"
               />
+              {search.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetSearch}
+                  aria-label="Reset search"
+                  title="Reset search"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 flex size-6 items-center justify-center rounded-full text-[#8a8a8a] transition-colors hover:bg-[#f3ede4] hover:text-[#1a1a1a] focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                  <X className="size-3.5" />
+                </button>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      <div className="mt-7 grid grid-cols-3 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-6">
-        {fosters.map((foster) => (
-          <button
-            key={foster.id}
+      {search.trim().length > 0 && fosters.length === 0 ? (
+        <div className="my-10 flex flex-col items-center justify-center rounded-[20px] border border-dashed border-[#e5e0d8] bg-[#fbf9f5] px-6 py-12 text-center">
+          <div className="flex size-12 items-center justify-center rounded-full bg-[#f3ede4] text-[#8a8178]">
+            <Search className="size-5" />
+          </div>
+          <h3 className="mt-3 text-base font-semibold text-[#1a1a1a]">
+            No fosters found
+          </h3>
+          <p className="mt-1 max-w-sm text-sm text-[#736c64]">
+            No past fosters match &ldquo;{search.trim()}&rdquo;. Try another name, breed, or rescue.
+          </p>
+          <Button
             type="button"
-            onClick={() => setSelected(foster)}
-            aria-label={`View ${foster.name}`}
-            className="min-w-0 overflow-hidden rounded-[16px] border border-border bg-white text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary"
+            variant="outline"
+            onClick={handleResetSearch}
+            className="mt-4 h-9 rounded-[12px] border-[#e0d9cf] bg-white px-4 text-sm font-medium hover:bg-[#f5f1eb]"
           >
-            <div className="relative aspect-100/88 bg-secondary md:aspect-233/160">
-              {foster.image ? (
-                <Image
-                  src={foster.image}
-                  alt={foster.name}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 767px) 30vw, 233px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs font-semibold text-[#9A9A9A]">
-                  No photo
-                </div>
-              )}
-            </div>
-            <div className="min-h-11 px-2 py-3 text-sm font-medium md:px-3">
-              <p className="truncate">{foster.name}</p>
-              <p className="mt-0.5 hidden truncate text-xs text-[#8a8a8a] md:block">
-                {foster.rescue || "Rescue not added"}
-              </p>
-            </div>
-          </button>
-        ))}
-      </div>
+            Reset search
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-7 grid grid-cols-3 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-6">
+          {fosters.map((foster) => (
+            <button
+              key={foster.id}
+              type="button"
+              onClick={() => setSelected(foster)}
+              aria-label={`View ${foster.name}`}
+              className="min-w-0 overflow-hidden rounded-[16px] border border-border bg-white text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <div className="relative aspect-100/88 bg-secondary md:aspect-233/160">
+                {foster.image ? (
+                  <Image
+                    src={foster.image}
+                    alt={foster.name}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 767px) 30vw, 233px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs font-semibold text-[#9A9A9A]">
+                    No photo
+                  </div>
+                )}
+              </div>
+              <div className="min-h-11 px-2 py-3 text-sm font-medium md:px-3">
+                <p className="truncate">{foster.name}</p>
+                <p className="mt-0.5 hidden truncate text-xs text-[#8a8a8a] md:block">
+                  {foster.rescue || "Rescue not added"}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       <section className="flex flex-col gap-6 rounded-[16px] border border-border px-5 py-6 md:flex-row md:items-center">
         <Image
@@ -207,10 +263,10 @@ export default function MyFosterFamilyClient({
                     />
                   </div>
                   <div className="mt-5 rounded-[16px] border border-input bg-white px-4 py-3.5">
-                    <p className="text-[13px] font-semibold leading-5">
+                    <p className="text-[13px] font-semibold leading-5 text-[#252525]">
                       About them
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-[#4a4a4a]">
+                    <p className="mt-2 text-sm leading-6 text-[#4a4a4a] whitespace-pre-wrap">
                       {selected.about ||
                         "No about details have been added yet."}
                     </p>

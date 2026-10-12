@@ -43,7 +43,25 @@ export default function AccountForm({
   const profilePreview = profileImage || "/avatar/DogIllustration.svg";
   const memberSince = useMemo(() => formatMemberSince(user.createdAt), [user.createdAt]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image too large", {
+        description: "Please select an image smaller than 2MB.",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setProfileImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -60,6 +78,7 @@ export default function AccountForm({
 
   return (
     <form action={formAction} className="max-w-309.75">
+      <input type="hidden" name="image" value={profileImage} />
       <PageHeading
         title="Account"
         action={
@@ -76,13 +95,29 @@ export default function AccountForm({
 
       <div className="mt-5 grid gap-6 md:mt-[29px] lg:grid-cols-[395px_1fr]">
         <Card className="rounded-[16px] border-[#ede9e4] p-8 text-center shadow">
-          <div className="mx-auto h-[156px] w-[156px] overflow-hidden rounded-full border border-[#ede9e4] bg-[#f9f5eb]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={profilePreview}
-              alt={displayName}
-              className="h-full w-full object-cover"
-            />
+          <div className="relative mx-auto h-[156px] w-[156px]">
+            <div className="h-full w-full overflow-hidden rounded-full border border-[#ede9e4] bg-[#f9f5eb]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profilePreview}
+                alt={displayName}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-1 right-1 flex size-10 cursor-pointer items-center justify-center rounded-full bg-[#ee9266] text-white shadow-md hover:bg-[#df8358] transition-colors"
+              title="Change photo"
+            >
+              <Camera className="size-5" />
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handleImageChange}
+              />
+            </label>
           </div>
           <h2 className="mt-4 text-[32px] font-semibold text-[#1a1a1a]">
             {displayName}

@@ -1,7 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { emptyFoster, type Foster } from "@/lib/fosters";
-import { ArrowUpDown, Info, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, Info, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -96,24 +97,32 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
   }
 
   return (
-    <div className="max-w-309.75">
-      <h1 className="text-xl md:text-2xl font-semibold md:font-bold leading-8">
+    <div className="max-w-[1239px] scroll-smooth">
+      <Link
+        href="/my-foster-family"
+        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-[#6F6B65] transition-colors hover:text-[#252525]"
+      >
+        <ArrowLeft className="size-4" />
+        Back to My Foster Family
+      </Link>
+
+      <h1 className="text-xl md:text-2xl font-semibold md:font-bold leading-8 text-[#252525]">
         Add a Past Foster (Backfill)
       </h1>
-      <p className="mt-1 text-sm text-[#9A9A9A] md:w-2/5">
+      <p className="mt-1 text-sm text-[#9A9A9A] max-w-2xl">
         Fostered previously? Add them to complete your gallery. Each entry will
         appear in My Foster Family.
       </p>
 
-      <div className="mt-5 rounded-[16px] border border-input bg-white p-6 shadow">
-        <p className="text-base font-semibold">Add new past foster</p>
-        <div className="mt-4 grid gap-6 lg:flex items-start">
+      <div className="mt-6 rounded-[20px] border border-input bg-white p-5 sm:p-8 shadow-xs">
+        <p className="text-base font-semibold text-[#252525]">Add new past foster</p>
+        <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[360px_1fr] xl:grid-cols-[380px_1fr] items-start">
           <PastFosterPhotoUpload
             value={draft.image}
             onChange={(value) => update("image", value)}
-            className="bg-white md:w-95"
+            className="bg-white h-[340px] sm:h-[380px]"
           />
-          <div className="flex-1">
+          <div className="w-full min-w-0 flex-1">
             <FormField
               label="Pet's name"
               placeholder="Enter pet's name"
@@ -139,7 +148,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
               onChange={(e) => update("breed", e.target.value)}
               maxLength={80}
             />
-            <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
               <FormField
                 label="Age"
                 placeholder="Enter age"
@@ -155,7 +164,7 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
                 maxLength={20}
               />
             </div>
-            <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
               <FormField
                 placeholder=""
                 label="Start date"
@@ -173,6 +182,20 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
                 onChange={(e) => update("endDate", e.target.value)}
               />
             </div>
+
+            <label className="mt-5 block">
+              <span className="text-[13px] font-semibold leading-5 text-[#252525]">
+                About them
+              </span>
+              <textarea
+                value={draft.about}
+                onChange={(e) => update("about", e.target.value)}
+                maxLength={500}
+                rows={4}
+                placeholder="Add memories or a couple sentences about your foster pet that show their personality!"
+                className="mt-2 w-full resize-y rounded-2xl border border-input bg-white px-4 py-3.5 text-sm outline-none placeholder:text-[#bfbbb5] focus:ring-2 focus:ring-primary/30"
+              />
+            </label>
           </div>
         </div>
 
@@ -182,68 +205,69 @@ export default function PastFosterForm({ recentPastFosters = [] }: { recentPastF
           </p>
         )}
 
-        <div className="mt-5 flex flex-col-reverse items-start justify-between gap-3 sm:flex-row sm:items-center">
-          <p className="hidden sm:flex items-center gap-2 text-[13px] text-[#9A9A9A]">
-            <Info className="size-4 shrink-0" />
+        <div className="mt-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border/60">
+          <p className="flex items-center gap-2 text-[13px] text-[#9A9A9A]">
+            <Info className="size-4 shrink-0 text-[#ee9266]" />
             Add as many past fosters as you like. They'll be listed below in
             chronological order.
           </p>
           <Button
             type="button"
-            variant="outline"
             onClick={addPastFoster}
             disabled={pending}
-            className="w-full sm:w-fit h-11 shrink-0 rounded-[12px] border-[#D96F61] px-5 text-[#D96F61] hover:bg-[#D96F61]/5 hover:text-[#D96F61]"
+            className="w-full sm:w-auto h-11 shrink-0 rounded-[12px] bg-[#ee9266] px-6 text-white hover:bg-[#df8358] shadow-[0_4px_8px_rgba(217,111,97,0.3)] touch-manipulation cursor-pointer"
           >
             <Plus className="size-4" /> {pending ? "Saving..." : "Add past foster"}
           </Button>
         </div>
       </div>
 
-      <div className="mt-6 rounded-[16px] border border-input bg-white pt-6 shadow">
-        <div className="flex items-center justify-between border-b px-6 pb-6">
-          <p className="text-base font-semibold">
+      <div className="mt-8 rounded-[20px] border border-input bg-white p-6 shadow-xs">
+        <div className="flex items-center justify-between border-b pb-4">
+          <p className="text-base font-semibold text-[#252525]">
             Past fosters added ({recentPastFosters.length})
           </p>
           <button
             type="button"
             onClick={() => setOldestFirst((current) => !current)}
-            className="flex items-center gap-1.5 text-[13px] text-[#9A9A9A] hover:underline"
+            className="flex items-center gap-1.5 text-[13px] text-[#9A9A9A] hover:underline cursor-pointer"
           >
             <ArrowUpDown className="size-3.5" /> {oldestFirst ? "Oldest first" : "Newest first"}
           </button>
         </div>
 
         {sortedPastFosters.length === 0 ? (
-          <p className="mt-4 text-sm text-[#9A9A9A] p-6 pt-0">No past fosters added yet.</p>
+          <p className="mt-4 text-sm text-[#9A9A9A] py-2">No past fosters added yet.</p>
         ) : (
-          <ul className="divide-y divide-input">
-            {sortedPastFosters.map((entry) => (
-              <li key={entry.id} className="flex items-center gap-3 py-3 px-6">
-                {entry.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={entry.image} alt={entry.name} className="size-10 shrink-0 rounded-full object-cover" />
-                ) : (
-                  <div className="size-10 shrink-0 rounded-full bg-[#f2f0ed]" />
-                )}
-                <div className="flex-1">
-                  <p className="text-sm font-semibold leading-5">{entry.name}</p>
-                  <p className="text-[13px] text-[#9A9A9A]">
-                    {formatPastFosterDate(entry.startDate)} - {formatPastFosterDate(entry.endDate)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removePastFoster(entry.id, entry.name)}
-                  aria-label={`Remove ${entry.name}`}
-                  disabled={deletingId === entry.id}
-                  className="p-2 text-[#9A9A9A] hover:text-destructive disabled:opacity-50"
-                >
-                  <Trash2 className="size-4" />
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="max-h-96 overflow-y-auto overscroll-contain">
+            <ul className="divide-y divide-input">
+              {sortedPastFosters.map((entry) => (
+                <li key={entry.id} className="flex items-center gap-3 py-3 px-2">
+                  {entry.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={entry.image} alt={entry.name} className="size-10 shrink-0 rounded-full object-cover" />
+                  ) : (
+                    <div className="size-10 shrink-0 rounded-full bg-[#f2f0ed]" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-5 truncate">{entry.name}</p>
+                    <p className="text-[13px] text-[#9A9A9A]">
+                      {formatPastFosterDate(entry.startDate)} - {formatPastFosterDate(entry.endDate)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removePastFoster(entry.id, entry.name)}
+                    aria-label={`Remove ${entry.name}`}
+                    disabled={deletingId === entry.id}
+                    className="p-2 text-[#9A9A9A] hover:text-destructive disabled:opacity-50 cursor-pointer"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </div>
