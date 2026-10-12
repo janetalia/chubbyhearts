@@ -45,35 +45,50 @@ export default function PastFosterPhotoUpload({
   const defaultHeight = hasHeightOverride ? "" : (compact ? "h-[250px]" : "h-[312px]");
   const defaultBg = hasBgOverride ? "" : (compact ? "bg-white" : "bg-[#edeac8]");
 
-  return <div className="relative md:w-95">
-    {isEdit?<Image src='/Vector.svg' alt='vector image' height={200} width={200} className="absolute top-0 right-0 size-44 z-10" />:''}
-    
-    <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Upload pet photo" className="sr-only" onChange={event => void upload(event.target.files?.[0])} />
-    <button
-      type="button"
-      disabled={busy}
-      onClick={() => input.current?.click()}
-      className={`relative flex flex-col items-center justify-center overflow-hidden rounded-[12px] border-2 border-dashed w-full md:w-95 border-[#e9e5de] ${defaultHeight} ${defaultBg} ${className}`}
-    >
-      {value ? <> 
-      <Image
-        src={value}
-        alt="Pet photo"
-        fill
-        unoptimized
-        sizes="(max-width: 767px) 60vw, 601px"
-        className="object-cover"
+  return (
+    <div className="relative w-full">
+      <input
+        ref={input}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        aria-label="Upload pet photo"
+        className="sr-only"
+        onChange={(event) => void upload(event.target.files?.[0])}
       />
-    <span className="absolute bottom-4 left-3 flex items-center gap-2 text-xs">
-      <Camera className="size-3" />Upload photo</span></> : 
-      <>
-        <Camera className="size-7 text-[#D96F61]" />
-        <span className="mt-3 text-sm font-semibold">{busy ?
-         "Uploading..." : compact ? "Upload photo" :
-          "Add photo"}</span><span className="text-xs leading-5 text-slate-400">JPG, PNG · Max 10MB</span></>
-          }
-    </button>
-    {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
-    
-  </div>;
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => input.current?.click()}
+        className={`relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[16px] border-2 border-dashed border-[#e9e5de] touch-manipulation cursor-pointer transition-colors hover:border-[#ee9266]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${defaultHeight} ${defaultBg} ${className}`}
+      >
+        {value ? (
+          <>
+            <Image
+              src={value}
+              alt="Pet photo"
+              fill
+              unoptimized
+              sizes="(max-width: 767px) 90vw, (max-width: 1024px) 50vw, 380px"
+              className="object-cover"
+            />
+            <span className="absolute bottom-4 left-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-[#252525] shadow-xs backdrop-blur-xs">
+              <Camera className="size-3 text-[#D96F61]" />
+              Change photo
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="flex size-14 items-center justify-center rounded-full bg-white shadow-xs">
+              <Camera className="size-6 text-[#D96F61]" />
+            </div>
+            <span className="mt-3 text-sm font-semibold text-[#1e293b]">
+              {busy ? "Uploading..." : compact ? "Upload photo" : "Add photo"}
+            </span>
+            <span className="text-xs leading-5 text-slate-400">JPG, PNG · Max 10MB</span>
+          </>
+        )}
+      </button>
+      {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
+    </div>
+  );
 }

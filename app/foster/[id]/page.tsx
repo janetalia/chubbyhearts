@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ExternalLink, Heart } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/lib/prisma";
@@ -16,29 +15,21 @@ export default async function PublicFosterPage({
   const { id } = await params;
   const pet = await db.orm.public.Pet.where({ id }).first();
 
-  if (!pet) {
-    notFound();
-  }
+  if (!pet || pet.status === "PAST") {
+    return (
+      <main className="min-h-screen bg-[#faf7ef] px-4 py-8 text-[#1a1a1a] md:px-8 md:py-12">
+        <div className="mx-auto max-w-5xl">
+          <Link href="/" className="inline-block shrink-0">
+            <Image
+              src="/logo/Frame 2147235265.svg"
+              alt="Chubby Hearts"
+              width={160}
+              height={47}
+              priority
+              className="h-10 w-auto md:h-11"
+            />
+          </Link>
 
-  const foster = petToFoster(pet);
-  const details = [
-    { label: "Age", value: foster.age },
-    { label: "Weight", value: foster.weight },
-    { label: "Breed", value: foster.breed },
-  ];
-
-  return (
-    <main className="min-h-screen bg-[#faf7ef] px-4 py-8 text-[#1a1a1a] md:px-8 md:py-12">
-      <div className="mx-auto max-w-5xl">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#e05a3a]"
-        >
-          <Heart className="size-4 fill-[#fb2c36] text-[#fb2c36]" />
-          Chubby Hearts
-        </Link>
-
-        {foster.status === "past" ? (
           <Card className="mt-6 flex min-h-[400px] flex-col items-center justify-center overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-12 text-center shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
             <Image 
               src="/avatar/Image (Pet).svg" 
@@ -51,8 +42,33 @@ export default async function PublicFosterPage({
               This card is no longer active.
             </h1>
           </Card>
-        ) : (
-          <Card className="mt-6 overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-0 shadow-[0_12px_32px_rgba(0,0,0,0.08)] md:grid md:grid-cols-[0.9fr_1.1fr]">
+        </div>
+      </main>
+    );
+  }
+
+  const foster = petToFoster(pet);
+  const details = [
+    { label: "Age", value: foster.age },
+    { label: "Weight", value: foster.weight },
+    { label: "Breed", value: foster.breed },
+  ];
+
+  return (
+    <main className="min-h-screen bg-[#faf7ef] px-4 py-8 text-[#1a1a1a] md:px-8 md:py-12">
+      <div className="mx-auto max-w-5xl">
+        <Link href="/" className="inline-block shrink-0">
+          <Image
+            src="/logo/Frame 2147235265.svg"
+            alt="Chubby Hearts"
+            width={160}
+            height={47}
+            priority
+            className="h-10 w-auto md:h-11"
+          />
+        </Link>
+
+        <Card className="mt-6 overflow-hidden rounded-[22px] border-[#ede9e4] bg-white p-0 shadow-[0_12px_32px_rgba(0,0,0,0.08)] md:grid md:grid-cols-[0.9fr_1.1fr]">
             <div className="relative min-h-[320px] bg-secondary md:min-h-[620px]">
               {foster.image ? (
                 <Image
@@ -148,7 +164,6 @@ export default async function PublicFosterPage({
               </div>
             </section>
           </Card>
-        )}
       </div>
     </main>
   );

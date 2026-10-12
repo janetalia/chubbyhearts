@@ -14,14 +14,56 @@ export default async function MyFosterFamilyPage() {
     .where({ userId: session.user.id, status: "PAST" })
     .all();
 
-  // Sort chronologically (newest first based on endDate, then startDate)
+  // Sort by startDate (newest to oldest). If missing startDate, show at the end.
   pets.sort((a, b) => {
-    const timeA = (a.endDate as any)?.epochMilliseconds || (a.startDate as any)?.epochMilliseconds || 0;
-    const timeB = (b.endDate as any)?.epochMilliseconds || (b.startDate as any)?.epochMilliseconds || 0;
-    return timeB - timeA;
+    const timeA = getEpochMs(a.startDate);
+    const timeB = getEpochMs(b.startDate);
+
+    if (!timeA && !timeB) {
+      const createdA = getEpochMs((a as any).createdAt);
+      const createdB = getEpochMs((b as any).createdAt);
+      return createdB - createdA;
+    }
+    if (!timeA) return 1;
+    if (!timeB) return -1;
+
+    if (timeB !== timeA) {
+      return timeB - timeA;
+    }
+
+    const createdA = getEpochMs((a as any).createdAt);
+    const createdB = getEpochMs((b as any).createdAt);
+    return createdB - createdA;
   });
 
   return <MyFosterFamilyClient pastFosters={pets.map(toFosterFamilyPet)} />;
+}
+
+function getEpochMs(value: unknown): number {
+  if (!value) return 0;
+  if (typeof value === "object") {
+    try {
+      if ("epochMilliseconds" in (value as any) && typeof (value as any).epochMilliseconds === "number") {
+        return (value as any).epochMilliseconds;
+      }
+      if (value instanceof Date) {
+        const time = value.getTime();
+        return isNaN(time) ? 0 : time;
+      }
+      const parsed = Date.parse(String(value));
+      return isNaN(parsed) ? 0 : parsed;
+    } catch {
+      return 0;
+    }
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  if (typeof value === "number" && !isNaN(value)) {
+    return value;
+  }
+  return 0;
 }
 
 function toFosterFamilyPet(pet: {
@@ -53,13 +95,12 @@ function toFosterFamilyPet(pet: {
 }
 
 function formatDate(value: unknown) {
-  if (!value) return "";
-  if (typeof value === "object" && "epochMilliseconds" in value && typeof value.epochMilliseconds === "number") {
-    return new Date(value.epochMilliseconds).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }
-  return String(value);
+  const ms = getEpochMs(value);
+  if (!ms) return "";
+  return new Date(ms).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }

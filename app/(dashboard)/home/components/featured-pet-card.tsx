@@ -151,7 +151,10 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
 
         {/* BACK FACE (details view) */}
         <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
-          <div className="flex min-h-0 flex-1 flex-col pt-6 md:pt-0">
+          <div
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-6 md:pt-0"
+            onClick={event => event.stopPropagation()}
+          >
             <div className="grid shrink-0 gap-3 md:grid-cols-3">
               {detailItems.map(item => (
                 <div key={item.label}>
@@ -166,10 +169,10 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
             <div className="mt-5 flex min-h-0 flex-1 flex-col">
               <p className="shrink-0 text-[13px] font-semibold leading-5">About them</p>
               <div
-                className="mt-2 min-h-0 flex-1 overflow-y-auto rounded-[16px] border border-input bg-white px-4 py-3.5"
+                className="mt-2 min-h-fit flex-1 overflow-y-auto rounded-[16px] border border-input bg-white px-4 py-3.5"
                 onClick={event => event.stopPropagation()}
               >
-                <p className="break-words text-sm leading-6 text-[#4a4a4a]">
+                <p className="wrap-break-word text-sm leading-6 text-[#4a4a4a]">
                   {foster.about || "No about details have been added yet."}
                 </p>
               </div>

@@ -15,15 +15,29 @@ export default function SigninCard() {
   const [step, setStep] = useState<'initial' | 'email' | 'signin' | 'signup'>('initial');
   const [email, setEmail] = useState('');
   const [isChecking, setIsChecking] = useState(false);
+  const [isGoogleAccount, setIsGoogleAccount] = useState(false);
+
+  useEffect(() => {
+    if (loginState.isGoogleAccount) {
+      setIsGoogleAccount(true);
+    }
+  }, [loginState.isGoogleAccount]);
 
   useEffect(() => {
     if (loginState.error) {
-      toast.error("Sign in failed", {
-        description: loginState.error,
-        id: "signin-error",
-      });
+      if (loginState.isGoogleAccount) {
+        toast.info("Google Account Detected", {
+          description: loginState.error,
+          id: "signin-error",
+        });
+      } else {
+        toast.error("Sign in failed", {
+          description: loginState.error,
+          id: "signin-error",
+        });
+      }
     }
-  }, [loginState.error]);
+  }, [loginState.error, loginState.isGoogleAccount]);
 
   useEffect(() => {
     if (registerState.error) {
@@ -36,11 +50,13 @@ export default function SigninCard() {
 
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) return;
 
     setIsChecking(true);
+    setIsGoogleAccount(false);
     try {
-      const exists = await checkEmailExists(email);
+      const exists = await checkEmailExists(trimmedEmail);
       if (exists) {
         setStep('signin');
       } else {
@@ -59,14 +75,14 @@ export default function SigninCard() {
     <main className="flex min-h-[calc(100vh-81px)] items-center justify-center px-5 py-10">
       <section className="w-full max-w-104.5 rounded-[37px] bg-white px-8 pb-6 pt-8.5">
         <div className="flex flex-col items-center gap-4.25">
-          <img
+          <Image
             src="/logo/image 35.svg"
             alt=""
             width="336"
             height="218"
             className="h-40 sm:h-54.5 w-64 sm:w-84 max-w-full object-contain"
           />
-          <img
+          <Image
             src="/logo/image 34.svg"
             alt="Chubby Hearts"
             width="230"
@@ -140,7 +156,10 @@ export default function SigninCard() {
               </Button>
               <button
                 type="button"
-                onClick={() => setStep('initial')}
+                onClick={() => {
+                  setIsGoogleAccount(false);
+                  setStep('initial');
+                }}
                 className="w-full text-center text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
               >
                 Back
@@ -150,51 +169,100 @@ export default function SigninCard() {
 
           {step === 'signin' && (
             <>
-              <form action={loginFormAction} className="space-y-3">
-                <input type="hidden" name="email" value={email} />
-                <label className="block">
-                  <span className="text-[13px] font-semibold leading-5 text-[#252525]">
-                    Email
-                  </span>
-                  <Input
-                    type="email"
-                    disabled
-                    value={email}
-                    className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-[#f8f6f3] px-4 text-sm text-[#8c8883] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[13px] font-semibold leading-5 text-[#252525]">
-                    Password
-                  </span>
-                  <Input
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Enter your password"
-                    className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
-                  />
-                </label>
-                <Button
-                  type="submit"
-                  disabled={loginPending}
-                  className="h-13.25 w-full rounded-2xl bg-[#ee9266] text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358]"
-                >
-                  {loginPending ? "Signing in..." : "Sign in"}
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => setStep('email')}
-                  className="w-full text-center text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
-                >
-                  Back
-                </button>
-              </form>
-              <div className="pt-4 text-center">
-                <Link href="/reset-password" className="text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline">
-                  Forgot your password?
-                </Link>
-              </div>
+              {isGoogleAccount ? (
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-[#f5c7b8] bg-[#fef6f3] p-4 text-center">
+                    <p className="text-sm font-medium leading-relaxed text-[#c85635]">
+                      This account was created with Google. Please continue with Google to sign in.
+                    </p>
+                  </div>
+
+                  <form action={loginWithGoogle}>
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      className="h-13.75 w-full rounded-2xl border-[#e9e5de] bg-white text-sm font-semibold text-[#252525] shadow-[0_1px_1.5px_rgba(0,0,0,0.1),0_1px_1px_rgba(0,0,0,0.1)] hover:bg-[#faf8f5]"
+                    >
+                      <Image src="/icons/GoogleIcon.svg" alt="" width={18} height={18} />
+                      Continue with Google
+                    </Button>
+                  </form>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsGoogleAccount(false);
+                      setStep('email');
+                    }}
+                    className="w-full text-center text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
+                  >
+                    Back
+                  </button>
+
+                  <div className="pt-2 text-center">
+                    <Link
+                      href="/reset-password"
+                      className="text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <form action={loginFormAction} className="space-y-3">
+                    <input type="hidden" name="email" value={email} />
+                    <label className="block">
+                      <span className="text-[13px] font-semibold leading-5 text-[#252525]">
+                        Email
+                      </span>
+                      <Input
+                        type="email"
+                        disabled
+                        value={email}
+                        className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-[#f8f6f3] px-4 text-sm text-[#8c8883] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[13px] font-semibold leading-5 text-[#252525]">
+                        Password
+                      </span>
+                      <Input
+                        name="password"
+                        type="password"
+                        required
+                        placeholder="Enter your password"
+                        className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
+                      />
+                    </label>
+                    <Button
+                      type="submit"
+                      disabled={loginPending}
+                      className="h-13.25 w-full rounded-2xl bg-[#ee9266] text-sm font-semibold text-white shadow-[0_4px_8px_rgba(217,111,97,0.3)] hover:bg-[#df8358]"
+                    >
+                      {loginPending ? "Signing in..." : "Sign in"}
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsGoogleAccount(false);
+                        setStep('email');
+                      }}
+                      className="w-full text-center text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
+                    >
+                      Back
+                    </button>
+                  </form>
+                  <div className="pt-4 text-center">
+                    <Link
+                      href="/reset-password"
+                      className="text-sm font-semibold text-[#e05a3a] underline-offset-4 hover:underline"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
+                </>
+              )}
             </>
           )}
 
@@ -209,7 +277,7 @@ export default function SigninCard() {
                   <Input
                     name="firstName"
                     required
-                    placeholder="JL"
+                    placeholder="First name"
                     className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
                   />
                 </label>
@@ -220,7 +288,7 @@ export default function SigninCard() {
                   <Input
                     name="lastName"
                     required
-                    placeholder="Turner"
+                    placeholder="Last name"
                     className="mt-2 h-12.75 rounded-[16px] border-[#e9e5de] bg-white px-4 text-sm text-[#252525] placeholder:text-[#bfbbb5] focus-visible:ring-[#ee9266]/30"
                   />
                 </label>

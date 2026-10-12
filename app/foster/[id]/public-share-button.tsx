@@ -59,14 +59,17 @@ export default function PublicShareButton({
 
   return (
     <Dialog>
-      <DialogTrigger className={className}>
-        <Button
-          variant="outline"
-          className="h-12 w-full rounded-[14px] px-6 text-base"
-        >
-          <Share2 className="size-4" />
-          Share Profile
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="outline"
+            className="h-12 w-full rounded-[14px] px-6 text-base"
+          />
+        }
+        className={className}
+      >
+        <Share2 className="size-4" />
+        Share Profile
       </DialogTrigger>
       <DialogContent className="rounded-[22px] bg-white p-6 sm:max-w-100">
         <DialogHeader>

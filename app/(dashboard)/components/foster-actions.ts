@@ -191,12 +191,17 @@ export async function updateFoster(id: string, input: Foster): Promise<SaveFoste
   }
 
   const now = nowInstant();
+  const newStartDate = input.startDate 
+    ? instantFromDateInput(input.startDate) 
+    : existing.startDate;
+
   const newEndDate = cleaned.foster.status === "ACTIVE" 
     ? null 
-    : (existing.status === "ACTIVE" ? now : existing.endDate);
+    : (input.endDate ? instantFromDateInput(input.endDate) : (existing.status === "ACTIVE" ? now : existing.endDate));
 
   await db.orm.public.Pet.where({ id }).update({
     ...cleaned.foster,
+    startDate: newStartDate,
     endDate: newEndDate,
     updatedAt: now,
   });

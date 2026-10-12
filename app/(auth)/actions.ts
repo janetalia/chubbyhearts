@@ -9,6 +9,7 @@ import { db, nowInstant } from "@/lib/prisma";
 
 export type AuthFormState = {
   error?: string;
+  isGoogleAccount?: boolean;
 };
 
 const loginSchema = z.object({
@@ -47,9 +48,26 @@ export async function loginWithPassword(
     return { error: parsed.error.issues[0]?.message };
   }
 
+  const email = parsed.data.email.toLowerCase().trim();
+  const user = await db.orm.public.User.where({ email }).first();
+
+  if (user && !user.passwordHash) {
+    const googleAccount = await db.orm.public.Account
+      .where({ userId: user.id, provider: "google" })
+      .first();
+
+    if (googleAccount || !user.passwordHash) {
+      return {
+        error:
+          "This account was created with Google. Please continue with Google to sign in.",
+        isGoogleAccount: true,
+      };
+    }
+  }
+
   try {
     await signIn("credentials", {
-      email: parsed.data.email.toLowerCase(),
+      email,
       password: parsed.data.password,
       redirectTo: "/home",
     });
@@ -115,6 +133,6 @@ export async function registerWithPassword(
 }
 
 export async function checkEmailExists(email: string): Promise<boolean> {
-  const existingUser = await db.orm.public.User.where({ email: email.toLowerCase() }).first();
+  const existingUser = await db.orm.public.User.where({ email: email.toLowerCase().trim() }).first();
   return !!existingUser;
 }
