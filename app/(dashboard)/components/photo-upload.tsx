@@ -62,7 +62,7 @@ export default function PhotoUpload({
         fill
         unoptimized
         sizes="(max-width: 767px) 60vw, 601px"
-        className="object-cover"
+        className="object-contain object-center"
       />
     <span className="absolute bottom-4 left-3 flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs">
       <Camera className="size-3" />Change photo</span></> : <><span className="flex size-14 items-center justify-center rounded-full bg-white shadow-sm"><Camera className="size-5.5" /></span><span className="mt-3 text-sm font-semibold">{busy ? "Uploading..." : compact ? "Upload photo" : "Add photo"}</span><span className="text-xs leading-5 text-muted-foreground">{compact ? "JPG, PNG · Max 10MB" : "Tap to upload"}</span></>}

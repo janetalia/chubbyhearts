@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 import { CalendarDays, Eye, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useFosterFamilySearch } from "../components/foster-family-search-context";
-import { unarchiveFoster } from "../components/foster-actions";
+import { deletePastFoster } from "../components/foster-actions";
 
 export type FosterFamilyPet = {
   id: string;
@@ -38,6 +39,12 @@ export default function MyFosterFamilyClient({
 }) {
   const { search, setSearch } = useFosterFamilySearch();
   const [selected, setSelected] = useState<FosterFamilyPet | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const deletePending = useRef(false);
+  const router = useRouter();
+  const canDeleteSelected = Boolean(
+    selected?.id && pastFosters.some((foster) => foster.id === selected.id),
+  );
 
   const searchTerms = useMemo(() => {
     return search
@@ -74,6 +81,38 @@ export default function MyFosterFamilyClient({
     setSearch("");
   };
 
+  async function handleDelete() {
+    if (!selected || !canDeleteSelected || deletePending.current) return;
+    if (
+      !window.confirm(
+        `Permanently delete ${selected.name} from your past fosters? This action cannot be undone.`,
+      )
+    ) return;
+
+    deletePending.current = true;
+    setIsDeleting(true);
+
+    try {
+      const result = await deletePastFoster(selected.id);
+
+      if ("error" in result) {
+        toast.error("Past foster was not removed", { description: result.error });
+        return;
+      }
+
+      toast.success("Past foster removed");
+      setSelected(null);
+      router.refresh();
+    } catch {
+      toast.error("Past foster was not removed", {
+        description: "Please try again.",
+      });
+    } finally {
+      deletePending.current = false;
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="max-w-309.75">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -91,7 +130,7 @@ export default function MyFosterFamilyClient({
           </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <Link
             href="/my-foster-family/add"
             aria-label="Add a past foster"
@@ -105,7 +144,7 @@ export default function MyFosterFamilyClient({
           </Link>
 
           {(pastFosters.length > 0 || search.length > 0) && (
-            <div className="relative w-full md:mt-0 md:w-88">
+            <div className="relative min-w-0 w-full md:mt-0 md:w-88">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a8a8a]" />
               <Input
                 type="text"
@@ -221,7 +260,9 @@ export default function MyFosterFamilyClient({
 
       <Dialog
         open={Boolean(selected)}
-        onOpenChange={(open) => !open && setSelected(null)}
+        onOpenChange={(open) => {
+          if (!open && !deletePending.current) setSelected(null);
+        }}
       >
         <DialogContent className="rounded-[22px] bg-white p-0 sm:max-w-130 overflow-hidden flex flex-col max-h-[90vh]">
           {selected && (
@@ -266,35 +307,52 @@ export default function MyFosterFamilyClient({
                     <p className="text-[13px] font-semibold leading-5 text-[#252525]">
                       About them
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-[#4a4a4a] whitespace-pre-wrap">
+                    <p className="mt-2 wrap-anywhere text-sm leading-6 text-[#4a4a4a] whitespace-pre-wrap">
                       {selected.about ||
                         "No about details have been added yet."}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="shrink-0 border-t border-[#ede9e4] bg-white p-4 flex gap-3">
+              <div className="shrink-0 border-t border-[#ede9e4] bg-white p-4 grid grid-cols-2 gap-3 sm:flex">
                 <Button
+                  nativeButton={false}
                   render={
                     <Link href={`/edit-card/${selected.id}?unarchive=true`} />
                   }
                   variant="outline"
+                  disabled={isDeleting}
                   className="flex-1 h-11 rounded-[14px]"
                 >
                   Unarchive
                 </Button>
                 <Button
+                  nativeButton={false}
                   render={
                     <Link href={`/my-foster-family/edit/${selected.id}`} />
                   }
                   variant="outline"
+                  disabled={isDeleting}
                   className="flex-1 h-11 rounded-[14px]"
                 >
                   Edit
                 </Button>
+                {canDeleteSelected && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    aria-busy={isDeleting}
+                    className="flex-1 h-11 rounded-[14px]"
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </Button>
+                )}
                 <Button
                   type="button"
                   onClick={() => setSelected(null)}
+                  disabled={isDeleting}
                   className="flex-1 h-11 rounded-[14px] bg-[#ee9266] hover:bg-[#df8358] text-white"
                 >
                   Done
