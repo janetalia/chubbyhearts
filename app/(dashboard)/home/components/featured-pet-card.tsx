@@ -118,6 +118,7 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
         aria-pressed={flipped}
         onClick={toggleCard}
         onKeyDown={event => {
+          if (event.target !== event.currentTarget) return;
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
             toggleCard();
@@ -126,10 +127,10 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
         className={`relative min-h-0 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
       >
         {/* FRONT FACE */}
-        <Card className="relative flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:absolute md:inset-0 md:flex-row">
+        <Card inert={flipped} className="relative flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:absolute md:inset-0 md:flex-row">
           <div className="relative h-64.25 shrink-0 overflow-hidden bg-secondary md:h-101 md:w-[32%]">
-            {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-cover md:block" : "object-cover"} priority />}
-            {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="100vw" className="object-cover md:hidden" priority />}
+            {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-contain object-center md:block" : "object-contain object-center"} priority />}
+            {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="100vw" className="object-contain object-center md:hidden" priority />}
             <div className="absolute left-4.25 top-4 flex items-center gap-1 rounded-full bg-white px-2 py-1 shadow md:gap-2 md:px-4 md:py-1.5">
               <span className="size-3 rounded-full bg-[#4caf50]" /><span className="text-sm font-semibold leading-5.5 text-[#e05a3a] md:text-[17px]">Active</span>
             </div>
@@ -150,9 +151,12 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
         </Card>
 
         {/* BACK FACE (details view) */}
-        <Card className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
+        <Card inert={!flipped} className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-5 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden transform-[rotateY(180deg)] md:min-h-101.25 md:p-8.5">
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-6 md:pt-0"
+            role="region"
+            aria-label={`${foster.name} details`}
+            tabIndex={flipped ? 0 : -1}
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto wrap-anywhere pt-6 md:pt-0"
             onClick={event => event.stopPropagation()}
           >
             <div className="grid shrink-0 gap-3 md:grid-cols-3">
