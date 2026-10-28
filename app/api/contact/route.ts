@@ -32,8 +32,8 @@ function getBaseUrl(request: Request) {
   }
 
   return (
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
-    new URL(request.url).origin
+    process.env.NEXT_LOCAL_APP_URL?.replace(/\/$/, "") || process.env.NEXT_PRODUCTION_APP_URL?.replace(/\/$/, "") ||
+    new URL(request.url).origin || "https://mychubbyhearts.com"
   );
 }
 
