@@ -127,10 +127,10 @@ export default function FeaturedPetCard({ foster, onRemove }: { foster: HomePet,
         className={`relative min-h-0 cursor-pointer outline-none transition-transform duration-500 transform-3d focus-visible:ring-3 focus-visible:ring-primary/30 md:min-h-101.25 ${flipped ? "transform-[rotateY(180deg)]" : ""}`}
       >
         {/* FRONT FACE */}
-        <Card inert={flipped} className="relative flex gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:absolute md:inset-0 md:flex-row">
-          <div className="relative h-64.25 shrink-0 overflow-hidden bg-secondary md:h-101 md:w-[32%]">
-            {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 100vw, 395px" className={foster.id === "max" ? "hidden object-contain object-center md:block" : "object-contain object-center"} priority />}
-            {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="100vw" className="object-contain object-center md:hidden" priority />}
+        <Card inert={flipped} className="relative flex-row! items-stretch gap-0 overflow-hidden rounded-[22.5px] border-[#ede9e4] bg-white p-0 shadow-[0_5.6px_8.5px_-1.4px_rgba(0,0,0,0.1),0_2.8px_5.6px_-2.8px_rgba(0,0,0,0.1)] backface-hidden md:absolute md:inset-0">
+          <div className="relative min-h-64 w-[42%] shrink-0 self-stretch overflow-hidden bg-secondary sm:w-[36%] md:min-h-101 md:w-[32%]">
+            {foster.image && <Image src={foster.image} alt={foster.name} fill unoptimized sizes="(max-width: 767px) 42vw, 395px" className={foster.id === "max" ? "hidden object-cover object-center md:block" : "object-cover object-center"} priority />}
+            {foster.id === "max" && <Image src="/avatar/Image (Bella).svg" alt={foster.name} fill sizes="42vw" className="object-cover object-center md:hidden" priority />}
             <div className="absolute left-4.25 top-4 flex items-center gap-1 rounded-full bg-white px-2 py-1 shadow md:gap-2 md:px-4 md:py-1.5">
               <span className="size-3 rounded-full bg-[#4caf50]" /><span className="text-sm font-semibold leading-5.5 text-[#e05a3a] md:text-[17px]">Active</span>
             </div>
